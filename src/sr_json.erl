@@ -34,5 +34,6 @@ decode(Data) ->
 -spec encode_date(calendar:datetime()) -> binary().
 encode_date(DateTime) -> iso8601:format(DateTime).
 
+%% @todo remove binary_to_list when is8601 specs are fixed
 -spec decode_date(binary()) -> calendar:datetime().
-decode_date(DateTime) -> iso8601:parse(DateTime).
+decode_date(DateTime) -> iso8601:parse(binary_to_list(DateTime)).
