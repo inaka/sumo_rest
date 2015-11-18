@@ -9,7 +9,11 @@
         ]).
 
 -spec start(application:start_type(), any()) -> {ok, pid()}.
-start(_StartType, _Args) -> io:format("Hi!!~n"), {ok, self()}.
+start(_StartType, _Args) ->
+  _ = application:stop(lager),
+  ok = application:stop(sasl),
+  {ok, _} = application:ensure_all_started(sasl),
+  {ok, self()}.
 
 %% @todo revert cowboy-swagger workaround
 %%       once https://github.com/inaka/cowboy-swagger/issues/26 is fixed
@@ -27,7 +31,7 @@ start_phase(start_cowboy_listeners, _StartType, []) ->
   ok = hack_cowboy_swagger_path(),
 
   Handlers =
-    [ sr_entities_handler
+    [ sr_elements_handler
     , cowboy_swagger_handler
     ],
   Routes = trails:trails(Handlers),

@@ -13,5 +13,14 @@
 
 -export_type([json/0]).
 
--callback to_json(sumo:user_doc()) -> json().
--callback from_json(json()) -> sumo:user_doc().
+-type entity() :: sumo:user_doc().
+-export_type([entity/0]).
+
+-type reason() :: iodata().
+-export_type([reason/0]).
+
+-callback to_json(entity()) -> json().
+-callback from_json(json()) -> {ok, entity()} | {error, reason()}.
+-callback uri_path(entity()) -> iodata().
+%% @todo optional callback (it's only needed if dups should raise 409 conflict)
+-callback id(entity()) -> term().

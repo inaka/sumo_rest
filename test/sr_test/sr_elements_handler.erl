@@ -1,17 +1,18 @@
-%%% @doc POST|GET /entities handler
--module(sr_entities_handler).
+%%% @doc POST|GET /elements handler
+-module(sr_elements_handler).
 
 -behaviour(trails_handler).
 
 -include_lib("mixer/include/mixer.hrl").
--mixin([{ sr_base_handler
+-mixin([{ sr_entities_handler
         , [ init/3
           , rest_init/2
           , allowed_methods/2
-          , is_authorized/2
           , resource_exists/2
+          , content_types_accepted/2
           , content_types_provided/2
           , handle_get/2
+          , handle_post/2
           ]
         }]).
 
@@ -28,20 +29,20 @@ trails() ->
      },
   Metadata =
     #{ get =>
-       #{ tags => ["entities"]
-        , description => "Returns the list of entities"
+       #{ tags => ["elements"]
+        , description => "Returns the list of elements"
         , produces => ["application/json"]
         }
      , post =>
-       #{ tags => ["entities"]
-        , description => "Creates a new entity"
+       #{ tags => ["elements"]
+        , description => "Creates a new element"
         , consumes => ["application/json"]
         , produces => ["application/json"]
         , parameters => [RequestBody]
         }
      },
-  Path = "/entities",
+  Path = "/elements",
   Opts = #{ path => Path
-          , model => sr_entities
+          , model => sr_elements
           },
   [trails:trail(Path, ?MODULE, Opts, Metadata)].

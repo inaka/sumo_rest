@@ -28,7 +28,7 @@ ERLC_OPTS += +warn_bif_clash +warn_unused_record +warn_deprecated_function +warn
 ERLC_OPTS += +warn_export_vars +warn_exported_vars +warn_missing_spec +warn_untyped_record +debug_info
 
 TEST_ERLC_OPTS += +debug_info
-CT_OPTS += -cover test/cover.spec -vvv -erl_args -config ${CONFIG}
+CT_OPTS += -cover test/cover.spec -vvv -erl_args -boot start_sasl -config ${CONFIG}
 
 SHELL_OPTS += -name ${PROJECT}@`hostname` -config ${CONFIG} -boot start_sasl -s sync
 
