@@ -2,12 +2,13 @@ PROJECT = sumo_rest
 
 CONFIG ?= test/test.config
 
-DEPS = mixer cowboy jiffy katana trails swagger sumo_db
+DEPS = mixer cowboy iso8601 jiffy katana trails swagger sumo_db
 SHELL_DEPS = sync
 TEST_DEPS = elvis xref_runner shotgun
 
 dep_katana = git https://github.com/inaka/erlang-katana.git 0.2.14
 dep_cowboy = git https://github.com/extend/cowboy.git 1.0.4
+dep_iso8601 = git https://github.com/zerotao/erlang_iso8601.git 0d14540
 dep_jiffy = git https://github.com/davisp/jiffy.git 0.14.4
 dep_mixer = git https://github.com/inaka/mixer.git 0.1.4
 dep_sync = git https://github.com/inaka/sync.git 0.1.3
