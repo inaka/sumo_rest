@@ -2,12 +2,13 @@ PROJECT = sumo_rest
 
 CONFIG ?= test/test.config
 
-DEPS = mixer cowboy jiffy katana trails swagger sumo_db
+DEPS = mixer cowboy iso8601 jiffy katana trails swagger sumo_db
 SHELL_DEPS = sync
 TEST_DEPS = elvis xref_runner shotgun
 
 dep_katana = git https://github.com/inaka/erlang-katana.git 0.2.14
 dep_cowboy = git https://github.com/extend/cowboy.git 1.0.4
+dep_iso8601 = git https://github.com/zerotao/erlang_iso8601.git 0d14540
 dep_jiffy = git https://github.com/davisp/jiffy.git 0.14.4
 dep_mixer = git https://github.com/inaka/mixer.git 0.1.4
 dep_sync = git https://github.com/inaka/sync.git 0.1.3
@@ -19,7 +20,7 @@ dep_xref_runner = git https://github.com/inaka/xref_runner.git 0.2.2
 
 include erlang.mk
 
-LOCAL_DEPS := tools compiler syntax_tools common_test inets test_server dialyzer wx
+LOCAL_DEPS := tools compiler syntax_tools common_test inets test_server dialyzer wx mnesia
 DIALYZER_DIRS := ebin/ test/
 DIALYZER_OPTS := --verbose --statistics -Wunmatched_returns
 
@@ -28,7 +29,7 @@ ERLC_OPTS += +warn_bif_clash +warn_unused_record +warn_deprecated_function +warn
 ERLC_OPTS += +warn_export_vars +warn_exported_vars +warn_missing_spec +warn_untyped_record +debug_info
 
 TEST_ERLC_OPTS += +debug_info
-CT_OPTS += -cover test/cover.spec -vvv -erl_args -config ${CONFIG}
+CT_OPTS += -cover test/cover.spec -vvv -erl_args -boot start_sasl -config ${CONFIG}
 
 SHELL_OPTS += -name ${PROJECT}@`hostname` -config ${CONFIG} -boot start_sasl -s sync
 
