@@ -6,12 +6,12 @@ DEPS = mixer cowboy iso8601 jiffy katana trails swagger sumo_db
 SHELL_DEPS = sync
 TEST_DEPS = elvis xref_runner shotgun
 
-dep_katana = git https://github.com/inaka/erlang-katana.git 0.2.14
+dep_katana = git https://github.com/inaka/erlang-katana.git 07efe94
 dep_cowboy = git https://github.com/extend/cowboy.git 1.0.4
 dep_iso8601 = git https://github.com/zerotao/erlang_iso8601.git 0d14540
 dep_jiffy = git https://github.com/davisp/jiffy.git 0.14.4
 dep_mixer = git https://github.com/inaka/mixer.git 0.1.4
-dep_sync = git https://github.com/inaka/sync.git 0.1.3
+dep_sync = git https://github.com/rustyio/sync.git 9c78e7b
 dep_shotgun = git https://github.com/inaka/shotgun.git 0.1.12
 dep_sumo_db = git https://github.com/inaka/sumo_db.git 0.3.13
 dep_swagger = git https://github.com/inaka/cowboy-swagger e9b1062
