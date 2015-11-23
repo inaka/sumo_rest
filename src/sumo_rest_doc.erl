@@ -21,6 +21,9 @@
 
 -callback to_json(entity()) -> json().
 -callback from_json(json()) -> {ok, entity()} | {error, reason()}.
+-callback update(entity(), json()) -> {ok, entity()} | {error, reason()}.
 -callback uri_path(entity()) -> iodata().
 %% @todo optional callback (it's only needed if dups should raise 409 conflict)
 -callback id(entity()) -> term().
+%% @todo optional callback (it's only needed if ids are not coming in PUT jsons)
+-callback from_json(binary(), json()) -> {ok, entity()} | {error, reason()}.

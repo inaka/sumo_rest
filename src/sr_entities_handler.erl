@@ -10,6 +10,9 @@
         , handle_get/2
         , handle_post/2
         ]).
+-export([ announce_req/2
+        , handle_exception/3
+        ]).
 
 -type options() :: #{ path => string()
                     , model => module()
@@ -95,6 +98,30 @@ handle_post(Req, State) ->
     _:Exception -> handle_exception(Exception, Req, State)
   end.
 
+-spec announce_req(cowboy_req:req(), options()) -> cowboy_req:req().
+announce_req(Req, #{verbose := true}) ->
+  {Method, Req1} = cowboy_req:method(Req),
+  {Path,   Req2} = cowboy_req:path(Req1),
+  _ = error_logger:info_msg("~s ~s", [Method, Path]),
+  Req2;
+announce_req(Req, _Opts) -> Req.
+
+-spec handle_exception(term(), cowboy_req:req(), state()) ->
+    {halt, cowboy_req:req(), state()}.
+handle_exception(Reason, Req, State) ->
+  _ =
+    error_logger:error_msg(
+      "~p. Stack Trace: ~s", [Reason, ktn_debug:ppst()]),
+  {ok, Req1} =
+    try cowboy_req:reply(500, Req)
+    catch
+      _:Error ->
+        Msg = "~p trying to report error through cowboy. Stack Trace: ~s",
+        error_logger:error_msg(Msg, [Error, ktn_debug:ppst()]),
+        {ok, Req}
+    end,
+  {halt, Req1, State}.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Auxiliary Functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -118,33 +145,8 @@ handle_post(Entity, Req1, State) ->
   Location = iolist_to_binary([Path, Model:uri_path(PersistedEntity)]),
   {{true, Location}, Req2, State}.
 
-
--spec announce_req(cowboy_req:req(), options()) -> cowboy_req:req().
-announce_req(Req, #{verbose := true}) ->
-  {Method, Req1} = cowboy_req:method(Req),
-  {Path,   Req2} = cowboy_req:path(Req1),
-  _ = error_logger:info_msg("~s ~s", [Method, Path]),
-  Req2;
-announce_req(Req, _Opts) -> Req.
-
 -spec atom_to_method(get|put|post|delete) -> binary().
 atom_to_method(get) -> <<"GET">>;
 atom_to_method(put) -> <<"PUT">>;
 atom_to_method(post) -> <<"POST">>;
 atom_to_method(delete) -> <<"DELETE">>.
-
--spec handle_exception(term(), cowboy_req:req(), state()) ->
-    {halt, cowboy_req:req(), state()}.
-handle_exception(Reason, Req, State) ->
-  _ =
-    error_logger:error_msg(
-      "~p. Stack Trace: ~s", [Reason, ktn_debug:ppst()]),
-  {ok, Req1} =
-    try cowboy_req:reply(500, Req)
-    catch
-      _:Error ->
-        Msg = "~p trying to report error through cowboy. Stack Trace: ~s",
-        error_logger:error_msg(Msg, [Error, ktn_debug:ppst()]),
-        {ok, Req}
-    end,
-  {halt, Req1, State}.

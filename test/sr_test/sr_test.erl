@@ -32,6 +32,7 @@ start_phase(start_cowboy_listeners, _StartType, []) ->
 
   Handlers =
     [ sr_elements_handler
+    , sr_single_element_handler
     , cowboy_swagger_handler
     ],
   Routes = trails:trails(Handlers),

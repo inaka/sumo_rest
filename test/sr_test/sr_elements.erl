@@ -36,6 +36,8 @@
   , from_json/1
   , uri_path/1
   , id/1
+  , from_json/2
+  , update/2
   ]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -65,6 +67,10 @@ to_json(Element) ->
    , updated_at => sr_json:encode_date(maps:get(updated_at, Element))
    }.
 
+-spec from_json(key(), sumo_rest_doc:json()) ->
+  {ok, element()} | {error, iodata()}.
+from_json(Key, Json) -> from_json(Json#{<<"key">> => Key}).
+
 -spec from_json(sumo_rest_doc:json()) -> {ok, element()} | {error, iodata()}.
 from_json(Json) ->
   Now = sr_json:encode_date(calendar:universal_time()),
@@ -79,6 +85,16 @@ from_json(Json) ->
   catch
     _:{badkey, Key} ->
       {error, <<"missing field: ", Key/binary>>}
+  end.
+
+-spec update(element(), sumo_rest_doc:json()) ->
+  {ok, element()} | {error, iodata()}.
+update(Element, Json) ->
+  case from_json(id(Element), Json) of
+    {error, Reason} -> {error, Reason};
+    {ok, Updates} ->
+      UpdatedElement = maps:merge(Element, Updates),
+      {ok, UpdatedElement#{updated_at => calendar:universal_time()}}
   end.
 
 -spec uri_path(element()) -> binary().
