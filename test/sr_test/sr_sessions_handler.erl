@@ -35,6 +35,7 @@ trails() ->
   Path = "/sessions",
   Opts = #{ path => Path
           , model => sr_sessions
+          , verbose => true
           },
   [trails:trail(Path, ?MODULE, Opts, Metadata)].
 

@@ -4,9 +4,9 @@
 -behaviour(sumo_doc).
 -behaviour(sumo_rest_doc).
 
--type id() :: string().
+-type id() :: binary().
 -type token() :: binary().
--type user() :: string().
+-type user() :: binary().
 
 -opaque session() ::
   #{ id => undefined | id()
@@ -49,7 +49,7 @@
 -spec sumo_schema() -> sumo:schema().
 sumo_schema() ->
   sumo:new_schema(?MODULE,
-    [ sumo:new_field(id,          string,   [id, not_null])
+    [ sumo:new_field(id,          binary,   [id, not_null])
     , sumo:new_field(token,       string,   [not_null])
     , sumo:new_field(user,        string,   [not_null])
     , sumo:new_field(created_at,  datetime, [not_null])
@@ -64,11 +64,7 @@ sumo_wakeup(Session) -> Session.
 
 -spec to_json(session()) -> sumo_rest_doc:json().
 to_json(Session) ->
-  #{ id =>
-      case maps:get(id, Session) of
-        undefined -> null;
-        Id -> list_to_binary(Id)
-      end
+  #{ id => sr_json:encode_null(maps:get(id, Session))
    , token => maps:get(token, Session)
    , created_at => sr_json:encode_date(maps:get(created_at, Session))
    , expires_at => sr_json:encode_date(maps:get(expires_at, Session))
@@ -83,11 +79,7 @@ from_json(Json) ->
   Now = sr_json:encode_date(calendar:universal_time()),
   try
     { ok
-    , #{ id =>
-          case maps:get(<<"id">>, Json, null) of
-            null -> undefined;
-            Id -> binary_to_list(Id)
-          end
+    , #{ id => sr_json:decode_null(maps:get(<<"id">>, Json, null))
        , token => maps:get(<<"token">>, Json)
        , created_at =>
           sr_json:decode_date(maps:get(<<"created_at">>, Json, Now))
@@ -104,7 +96,7 @@ from_json(Json) ->
 update(_Session, _Json) -> throw(should_not_update_session).
 
 -spec uri_path(session()) -> binary().
-uri_path(Session) -> list_to_binary(id(Session)).
+uri_path(Session) -> id(Session).
 
 -spec id(session()) -> undefined | id().
 id(#{id := Id}) -> Id.
