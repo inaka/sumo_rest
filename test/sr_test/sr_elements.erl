@@ -78,8 +78,10 @@ from_json(Json) ->
     { ok
     , #{ key        => maps:get(<<"key">>, Json)
        , value      => maps:get(<<"value">>, Json)
-       , created_at => sr_json:decode_date(maps:get(created_at, Json, Now))
-       , updated_at => sr_json:decode_date(maps:get(updated_at, Json, Now))
+       , created_at =>
+          sr_json:decode_date(maps:get(<<"created_at">>, Json, Now))
+       , updated_at =>
+          sr_json:decode_date(maps:get(<<"updated_at">>, Json, Now))
        }
     }
   catch
