@@ -10,7 +10,6 @@
           , allowed_methods/2
           , resource_exists/2
           , content_types_provided/2
-          , handle_exception/3
           ]
         }]).
 
@@ -63,17 +62,13 @@ content_types_accepted(Req, State) ->
 -spec handle_post(cowboy_req:req(), state()) ->
   {{true, binary()}, cowboy_req:req(), state()}.
 handle_post(Req, State) ->
-  try
-    #{user := {User, _}} = State,
-    Session = sumo:persist(sr_sessions, sr_sessions:new(User)),
-    ResBody = sr_json:encode(sr_sessions:to_json(Session)),
-    Req1 = cowboy_req:set_resp_body(ResBody, Req),
-    SessionId = sr_sessions:uri_path(Session),
-    Location = <<"/sessions/", SessionId/binary>>,
-    {{true, Location}, Req1, State}
-  catch
-    _:Exception -> handle_exception(Exception, Req, State)
-  end.
+  #{user := {User, _}} = State,
+  Session = sumo:persist(sr_sessions, sr_sessions:new(User)),
+  ResBody = sr_json:encode(sr_sessions:to_json(Session)),
+  Req1 = cowboy_req:set_resp_body(ResBody, Req),
+  SessionId = sr_sessions:uri_path(Session),
+  Location = <<"/sessions/", SessionId/binary>>,
+  {{true, Location}, Req1, State}.
 
 -spec get_authorization(cowboy_req:req()) ->
     {{binary(), binary()}, cowboy_req:req()}

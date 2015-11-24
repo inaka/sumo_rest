@@ -11,7 +11,6 @@
         , handle_post/2
         ]).
 -export([ announce_req/2
-        , handle_exception/3
         ]).
 
 -type options() :: #{ path => string()
@@ -94,8 +93,7 @@ handle_post(Req, State) ->
       {halt, Req3, State};
     _:badjson ->
       Req3 = cowboy_req:set_resp_body(<<"Malformed JSON request">>, Req),
-      {false, Req3, State};
-    _:Exception -> handle_exception(Exception, Req, State)
+      {false, Req3, State}
   end.
 
 -spec announce_req(cowboy_req:req(), options()) -> cowboy_req:req().
@@ -105,22 +103,6 @@ announce_req(Req, #{verbose := true}) ->
   _ = error_logger:info_msg("~s ~s", [Method, Path]),
   Req2;
 announce_req(Req, _Opts) -> Req.
-
--spec handle_exception(term(), cowboy_req:req(), state()) ->
-    {halt, cowboy_req:req(), state()}.
-handle_exception(Reason, Req, State) ->
-  _ =
-    error_logger:error_msg(
-      "~p. Stack Trace: ~s", [Reason, ktn_debug:ppst()]),
-  {ok, Req1} =
-    try cowboy_req:reply(500, Req)
-    catch
-      _:Error ->
-        Msg = "~p trying to report error through cowboy. Stack Trace: ~s",
-        error_logger:error_msg(Msg, [Error, ktn_debug:ppst()]),
-        {ok, Req}
-    end,
-  {halt, Req1, State}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Auxiliary Functions
