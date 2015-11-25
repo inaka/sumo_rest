@@ -9,13 +9,13 @@
           , rest_init/2
           , allowed_methods/2
           , resource_exists/2
+          , content_types_accepted/2
           , content_types_provided/2
           ]
         }]).
 
 -export([ trails/0
         , is_authorized/2
-        , content_types_accepted/2
         , handle_post/2
         ]).
 
@@ -23,12 +23,19 @@
 
 -spec trails() -> trails:trails().
 trails() ->
+  RequestBody =
+    #{ name => <<"request body">>
+     , in => body
+     , description => <<"request body (as json)">>
+     , required => true
+     },
   Metadata =
     #{ post =>
        #{ tags => ["sessions"]
         , description => "Creates a new session"
         , consumes => ["application/json"]
         , produces => ["application/json"]
+        , parameters => [RequestBody]
         }
      },
   Path = "/sessions",
@@ -53,22 +60,6 @@ is_authorized(Req, State) ->
           {{false, auth_header()}, Req1, State}
       end
   end.
-
--spec content_types_accepted(cowboy_req:req(), state()) ->
-  {[{'*', atom()}], cowboy_req:req(), state()}.
-content_types_accepted(Req, State) ->
-  {[{'*', handle_post}], Req, State}.
-
--spec handle_post(cowboy_req:req(), state()) ->
-  {{true, binary()}, cowboy_req:req(), state()}.
-handle_post(Req, State) ->
-  #{user := {User, _}} = State,
-  Session = sumo:persist(sr_sessions, sr_sessions:new(User)),
-  ResBody = sr_json:encode(sr_sessions:to_json(Session)),
-  Req1 = cowboy_req:set_resp_body(ResBody, Req),
-  SessionId = sr_sessions:uri_path(Session),
-  Location = <<"/sessions/", SessionId/binary>>,
-  {{true, Location}, Req1, State}.
 
 -spec get_authorization(cowboy_req:req()) ->
     {{binary(), binary()}, cowboy_req:req()}
@@ -95,3 +86,27 @@ get_authorization(Req) ->
 
 -spec auth_header() -> binary().
 auth_header() -> <<"Basic Realm=\"Sumo Rest Test\"">>.
+
+-spec handle_post(cowboy_req:req(), state()) ->
+  {{true, binary()}, cowboy_req:req(), state()}.
+handle_post(Req, State) ->
+  #{user := {User, _}} = State,
+  try
+    {ok, Body, Req1} = cowboy_req:body(Req),
+    Json             = sr_json:decode(Body),
+    case sr_sessions:from_json(Json) of
+      {error, Reason} ->
+        Req2 = cowboy_req:set_resp_body(Reason, Req1),
+        {false, Req2, State};
+      {ok, Session} ->
+        FullSession = sr_sessions:user(Session, User),
+        sr_entities_handler:handle_post(FullSession, Req1, State)
+    end
+  catch
+    _:conflict ->
+      {ok, Req3} = cowboy_req:reply(409, [], <<"Duplicated entity">>, Req),
+      {halt, Req3, State};
+    _:badjson ->
+      Req3 = cowboy_req:set_resp_body(<<"Malformed JSON request">>, Req),
+      {false, Req3, State}
+  end.

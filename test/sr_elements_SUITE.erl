@@ -68,7 +68,8 @@ success_scenario(_Config) ->
   #{status_code := 200, body := Body3} =
     sr_test_utils:api_call(
       put, "/elements/element1", Headers,
-      #{ value => <<"newval1">>
+      #{ key => <<"element1">>
+       , value => <<"newval1">>
        }),
   #{ <<"key">>        := <<"element1">>
    , <<"created_at">> := CreatedAt
@@ -85,7 +86,9 @@ success_scenario(_Config) ->
   #{status_code := 201, body := Body5} =
     sr_test_utils:api_call(
       put, "/elements/element2", Headers,
-      #{value => <<"val2">>}),
+      #{ key => <<"element2">>
+       , value => <<"val2">>
+       }),
   #{ <<"key">>        := <<"element2">>
    , <<"created_at">> := CreatedAt5
    , <<"updated_at">> := CreatedAt5

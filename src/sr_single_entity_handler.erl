@@ -98,9 +98,9 @@ delete_resource(Req, State) ->
 %%% Auxiliary Functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 from_json(Model, Id, Json) ->
-  case erlang:function_exported(Model, from_json, 2) of
-    true -> Model:from_json(Id, Json);
-    false -> Model:from_json(Json)
+  try Model:from_json(Id, Json)
+  catch
+    _:undef -> Model:from_json(Json)
   end.
 
 handle_put({error, Reason}, Req, State) ->

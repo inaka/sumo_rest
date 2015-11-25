@@ -9,8 +9,10 @@
           , rest_init/2
           , allowed_methods/2
           , resource_exists/2
+          , content_types_accepted/2
           , content_types_provided/2
           , handle_get/2
+          , handle_put/2
           , delete_resource/2
           ]
         }]).
@@ -21,12 +23,19 @@
 
 -export([ trails/0
         , forbidden/2
+        , is_conflict/2
         ]).
 
 -type state() :: sr_single_entity_handler:state().
 
 -spec trails() -> trails:trails().
 trails() ->
+  RequestBody =
+    #{ name => <<"request body">>
+     , in => body
+     , description => <<"request body (as json)">>
+     , required => true
+     },
   Id =
     #{ name => id
      , in => path
@@ -35,11 +44,12 @@ trails() ->
      , type => string
      },
   Metadata =
-    #{ get =>
+    #{ put =>
        #{ tags => ["sessions"]
-        , description => "Returns a session"
+        , description => "Updates a session"
+        , consumes => ["application/json"]
         , produces => ["application/json"]
-        , parameters => [Id]
+        , parameters => [RequestBody, Id]
         }
      , delete =>
        #{ tags => ["sessions"]
@@ -62,3 +72,8 @@ forbidden(Req, State) ->
     notfound -> {false, Req, State};
     Session -> {User =/= sr_sessions:user(Session), Req, State}
   end.
+
+-spec is_conflict(cowboy_req:req(), state()) ->
+  {boolean(), cowboy_req:req(), state()}.
+is_conflict(Req, State) ->
+  {not maps:is_key(entity, State), Req, State}.
