@@ -20,7 +20,7 @@ dep_xref_runner = git https://github.com/inaka/xref_runner.git 0.2.2
 
 include erlang.mk
 
-LOCAL_DEPS := tools compiler syntax_tools common_test inets test_server dialyzer wx mnesia
+LOCAL_DEPS := tools compiler syntax_tools common_test crypto inets test_server dialyzer wx mnesia
 DIALYZER_DIRS := ebin/ test/
 DIALYZER_OPTS := --verbose --statistics -Wunmatched_returns
 

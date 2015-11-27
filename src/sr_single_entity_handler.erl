@@ -7,7 +7,6 @@
           , allowed_methods/2
           , content_types_provided/2
           , announce_req/2
-          , handle_exception/3
           ]
         }]).
 
@@ -74,8 +73,7 @@ handle_put(Req, #{entity := Entity} = State) ->
   catch
     _:badjson ->
       Req3 = cowboy_req:set_resp_body(<<"Malformed JSON request">>, Req),
-      {false, Req3, State};
-    _:Exception -> handle_exception(Exception, Req, State)
+      {false, Req3, State}
   end;
 handle_put(Req, #{id := Id} = State) ->
   #{opts := #{model := Model}} = State,
@@ -86,28 +84,23 @@ handle_put(Req, #{id := Id} = State) ->
   catch
     _:badjson ->
       Req3 = cowboy_req:set_resp_body(<<"Malformed JSON request">>, Req),
-      {false, Req3, State};
-    _:Exception -> handle_exception(Exception, Req, State)
+      {false, Req3, State}
   end.
 
 -spec delete_resource(cowboy_req:req(), state()) ->
   {boolean() | halt, cowboy_req:req(), state()}.
 delete_resource(Req, State) ->
   #{opts := #{model := Model}, id := Id} = State,
-  try
-    Result = sumo:delete(Model, Id),
-    {Result, Req, State}
-  catch
-    _:Exception -> handle_exception(Exception, Req, State)
-  end.
+  Result = sumo:delete(Model, Id),
+  {Result, Req, State}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Auxiliary Functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 from_json(Model, Id, Json) ->
-  case erlang:function_exported(Model, from_json, 2) of
-    true -> Model:from_json(Id, Json);
-    false -> Model:from_json(Json)
+  try Model:from_json(Id, Json)
+  catch
+    _:undef -> Model:from_json(Json)
   end.
 
 handle_put({error, Reason}, Req, State) ->

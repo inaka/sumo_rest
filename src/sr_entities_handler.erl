@@ -11,7 +11,7 @@
         , handle_post/2
         ]).
 -export([ announce_req/2
-        , handle_exception/3
+        , handle_post/3
         ]).
 
 -type options() :: #{ path => string()
@@ -94,37 +94,11 @@ handle_post(Req, State) ->
       {halt, Req3, State};
     _:badjson ->
       Req3 = cowboy_req:set_resp_body(<<"Malformed JSON request">>, Req),
-      {false, Req3, State};
-    _:Exception -> handle_exception(Exception, Req, State)
+      {false, Req3, State}
   end.
 
--spec announce_req(cowboy_req:req(), options()) -> cowboy_req:req().
-announce_req(Req, #{verbose := true}) ->
-  {Method, Req1} = cowboy_req:method(Req),
-  {Path,   Req2} = cowboy_req:path(Req1),
-  _ = error_logger:info_msg("~s ~s", [Method, Path]),
-  Req2;
-announce_req(Req, _Opts) -> Req.
-
--spec handle_exception(term(), cowboy_req:req(), state()) ->
-    {halt, cowboy_req:req(), state()}.
-handle_exception(Reason, Req, State) ->
-  _ =
-    error_logger:error_msg(
-      "~p. Stack Trace: ~s", [Reason, ktn_debug:ppst()]),
-  {ok, Req1} =
-    try cowboy_req:reply(500, Req)
-    catch
-      _:Error ->
-        Msg = "~p trying to report error through cowboy. Stack Trace: ~s",
-        error_logger:error_msg(Msg, [Error, ktn_debug:ppst()]),
-        {ok, Req}
-    end,
-  {halt, Req1, State}.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%% Auxiliary Functions
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+-spec handle_post(sumo:user_doc(), cowboy_req:req(), state()) ->
+  {{true, binary()}, cowboy_req:req(), state()}.
 handle_post(Entity, Req1, State) ->
   #{opts := #{model := Model, path := Path}} = State,
   case erlang:function_exported(Model, id, 1) of
@@ -144,6 +118,18 @@ handle_post(Entity, Req1, State) ->
   Req2 = cowboy_req:set_resp_body(ResBody, Req1),
   Location = iolist_to_binary([Path, Model:uri_path(PersistedEntity)]),
   {{true, Location}, Req2, State}.
+
+-spec announce_req(cowboy_req:req(), options()) -> cowboy_req:req().
+announce_req(Req, #{verbose := true}) ->
+  {Method, Req1} = cowboy_req:method(Req),
+  {Path,   Req2} = cowboy_req:path(Req1),
+  _ = error_logger:info_msg("~s ~s", [Method, Path]),
+  Req2;
+announce_req(Req, _Opts) -> Req.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Auxiliary Functions
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 -spec atom_to_method(get|put|post|delete) -> binary().
 atom_to_method(get) -> <<"GET">>;

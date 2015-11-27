@@ -68,7 +68,8 @@ success_scenario(_Config) ->
   #{status_code := 200, body := Body3} =
     sr_test_utils:api_call(
       put, "/elements/element1", Headers,
-      #{ value => <<"newval1">>
+      #{ key => <<"element1">>
+       , value => <<"newval1">>
        }),
   #{ <<"key">>        := <<"element1">>
    , <<"created_at">> := CreatedAt
@@ -85,7 +86,9 @@ success_scenario(_Config) ->
   #{status_code := 201, body := Body5} =
     sr_test_utils:api_call(
       put, "/elements/element2", Headers,
-      #{value => <<"val2">>}),
+      #{ key => <<"element2">>
+       , value => <<"val2">>
+       }),
   #{ <<"key">>        := <<"element2">>
    , <<"created_at">> := CreatedAt5
    , <<"updated_at">> := CreatedAt5
@@ -169,6 +172,7 @@ invalid_headers(_Config) ->
 -spec invalid_parameters(sr_test_utils:config()) -> {comment, string()}.
 invalid_parameters(_Config) ->
   Headers = #{<<"content-type">> => <<"application/json">>},
+  _ = sumo:persist(sr_elements, sr_elements:new(<<"key">>, <<"val">>)),
 
   ct:comment("Empty or broken parameters are reported"),
   #{status_code := 400} =
@@ -176,9 +180,13 @@ invalid_parameters(_Config) ->
   #{status_code := 400} =
     sr_test_utils:api_call(put, "/elements/nobody", Headers, <<>>),
   #{status_code := 400} =
+    sr_test_utils:api_call(put, "/elements/key", Headers, <<>>),
+  #{status_code := 400} =
     sr_test_utils:api_call(post, "/elements", Headers, <<"{">>),
   #{status_code := 400} =
     sr_test_utils:api_call(put, "/elements/broken", Headers, <<"{">>),
+  #{status_code := 400} =
+    sr_test_utils:api_call(put, "/elements/key", Headers, <<"{">>),
 
   ct:comment("Missing parameters are reported"),
   None = #{},
@@ -186,12 +194,16 @@ invalid_parameters(_Config) ->
     sr_test_utils:api_call(post, "/elements", Headers, None),
   #{status_code := 400} =
     sr_test_utils:api_call(put, "/elements/none", Headers, None),
+  #{status_code := 400} =
+    sr_test_utils:api_call(put, "/elements/key", Headers, None),
 
   NoVal = #{key => <<"noval">>},
   #{status_code := 400} =
     sr_test_utils:api_call(post, "/elements", Headers, NoVal),
   #{status_code := 400} =
     sr_test_utils:api_call(put, "/elements/noval", Headers, NoVal),
+  #{status_code := 400} =
+    sr_test_utils:api_call(put, "/elements/key", Headers, NoVal),
 
   {comment, ""}.
 
