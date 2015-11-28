@@ -87,11 +87,14 @@ from_json(Json) ->
 -spec update(element(), sumo_rest_doc:json()) ->
   {ok, element()} | {error, iodata()}.
 update(Element, Json) ->
-  case from_json(Json) of
-    {error, Reason} -> {error, Reason};
-    {ok, Updates} ->
-      UpdatedElement = maps:merge(Element, Updates),
-      {ok, UpdatedElement#{updated_at => calendar:universal_time()}}
+  try
+    NewValue = maps:get(<<"value">>, Json),
+    UpdatedElement =
+      Element#{value := NewValue, updated_at := calendar:universal_time()},
+    {ok, UpdatedElement}
+  catch
+    _:{badkey, Key} ->
+      {error, <<"missing field: ", Key/binary>>}
   end.
 
 -spec uri_path(element()) -> binary().

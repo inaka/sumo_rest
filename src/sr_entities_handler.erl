@@ -131,8 +131,9 @@ announce_req(Req, _Opts) -> Req.
 %%% Auxiliary Functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
--spec atom_to_method(get|put|post|delete) -> binary().
+-spec atom_to_method(get|patch|put|post|delete) -> binary().
 atom_to_method(get) -> <<"GET">>;
+atom_to_method(patch) -> <<"PATCH">>;
 atom_to_method(put) -> <<"PUT">>;
 atom_to_method(post) -> <<"POST">>;
 atom_to_method(delete) -> <<"DELETE">>.
