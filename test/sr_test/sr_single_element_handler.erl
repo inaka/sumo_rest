@@ -13,6 +13,7 @@
           , content_types_provided/2
           , handle_get/2
           , handle_put/2
+          , handle_patch/2
           , delete_resource/2
           ]
         }]).
@@ -41,6 +42,13 @@ trails() ->
         , description => "Returns an element"
         , produces => ["application/json"]
         , parameters => [Id]
+        }
+     , patch =>
+       #{ tags => ["elements"]
+        , description => "Updates an element"
+        , consumes => ["application/json"]
+        , produces => ["application/json"]
+        , parameters => [RequestBody, Id]
         }
      , put =>
        #{ tags => ["elements"]

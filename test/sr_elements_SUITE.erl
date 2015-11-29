@@ -69,9 +69,10 @@ success_scenario(_Config) ->
     sr_test_utils:api_call(
       put, "/elements/element1", Headers,
       #{ key => <<"element1">>
-       , value => <<"newval1">>
+       , value => <<"newval3">>
        }),
   #{ <<"key">>        := <<"element1">>
+   , <<"value">>      := <<"newval3">>
    , <<"created_at">> := CreatedAt
    , <<"updated_at">> := UpdatedAt
    } = Element3 = sr_json:decode(Body3),
@@ -82,40 +83,57 @@ success_scenario(_Config) ->
     sr_test_utils:api_call(get, "/elements"),
   [Element3] = sr_json:decode(Body4),
 
+  ct:comment("The element value can be changed by PATCH"),
+  #{status_code := 200, body := Body5} =
+    sr_test_utils:api_call(
+      patch, "/elements/element1", Headers, #{value => <<"newval5">>}),
+  #{ <<"key">>        := <<"element1">>
+   , <<"value">>      := <<"newval5">>
+   , <<"created_at">> := CreatedAt
+   , <<"updated_at">> := UpdatedAt5
+   } = Element5 = sr_json:decode(Body5),
+  true = UpdatedAt5 >= CreatedAt,
+
+  ct:comment("Still just one element"),
+  #{status_code := 200, body := Body6} =
+    sr_test_utils:api_call(get, "/elements"),
+  [Element5] = sr_json:decode(Body6),
+
   ct:comment("Elements can be created by PUT"),
-  #{status_code := 201, body := Body5} =
+  #{status_code := 201, body := Body7} =
     sr_test_utils:api_call(
       put, "/elements/element2", Headers,
       #{ key => <<"element2">>
        , value => <<"val2">>
        }),
   #{ <<"key">>        := <<"element2">>
-   , <<"created_at">> := CreatedAt5
-   , <<"updated_at">> := CreatedAt5
-   } = Element5 = sr_json:decode(Body5),
-  true = CreatedAt5 >= CreatedAt,
+   , <<"value">>      := <<"val2">>
+   , <<"created_at">> := CreatedAt7
+   , <<"updated_at">> := CreatedAt7
+   } = Element7 = sr_json:decode(Body7),
+  true = CreatedAt7 >= CreatedAt,
 
   ct:comment("There are two elements now"),
-  #{status_code := 200, body := Body6} =
+  #{status_code := 200, body := Body8} =
     sr_test_utils:api_call(get, "/elements"),
-  [Element5] = sr_json:decode(Body6) -- [Element3],
+  [Element7] = sr_json:decode(Body8) -- [Element5],
 
   ct:comment("Element1 is deleted"),
   #{status_code := 204} = sr_test_utils:api_call(delete, "/elements/element1"),
 
   ct:comment("One element again"),
-  #{status_code := 200, body := Body7} =
+  #{status_code := 200, body := Body9} =
     sr_test_utils:api_call(get, "/elements"),
-  [Element5] = sr_json:decode(Body7),
+  [Element7] = sr_json:decode(Body9),
 
   ct:comment("DELETE is not idempotent"),
   #{status_code := 204} = sr_test_utils:api_call(delete, "/elements/element2"),
   #{status_code := 404} = sr_test_utils:api_call(delete, "/elements/element2"),
 
   ct:comment("There are no elements"),
-  #{status_code := 200, body := Body8} =
+  #{status_code := 200, body := Body10} =
     sr_test_utils:api_call(get, "/elements"),
-  [] = sr_json:decode(Body8),
+  [] = sr_json:decode(Body10),
 
   {comment, ""}.
 
@@ -182,11 +200,15 @@ invalid_parameters(_Config) ->
   #{status_code := 400} =
     sr_test_utils:api_call(put, "/elements/key", Headers, <<>>),
   #{status_code := 400} =
+    sr_test_utils:api_call(patch, "/elements/key", Headers, <<>>),
+  #{status_code := 400} =
     sr_test_utils:api_call(post, "/elements", Headers, <<"{">>),
   #{status_code := 400} =
     sr_test_utils:api_call(put, "/elements/broken", Headers, <<"{">>),
   #{status_code := 400} =
     sr_test_utils:api_call(put, "/elements/key", Headers, <<"{">>),
+  #{status_code := 400} =
+    sr_test_utils:api_call(patch, "/elements/key", Headers, <<"{">>),
 
   ct:comment("Missing parameters are reported"),
   None = #{},
@@ -196,6 +218,8 @@ invalid_parameters(_Config) ->
     sr_test_utils:api_call(put, "/elements/none", Headers, None),
   #{status_code := 400} =
     sr_test_utils:api_call(put, "/elements/key", Headers, None),
+  #{status_code := 400} =
+    sr_test_utils:api_call(patch, "/elements/key", Headers, None),
 
   NoVal = #{key => <<"noval">>},
   #{status_code := 400} =
@@ -204,6 +228,8 @@ invalid_parameters(_Config) ->
     sr_test_utils:api_call(put, "/elements/noval", Headers, NoVal),
   #{status_code := 400} =
     sr_test_utils:api_call(put, "/elements/key", Headers, NoVal),
+  #{status_code := 400} =
+    sr_test_utils:api_call(patch, "/elements/key", Headers, NoVal),
 
   {comment, ""}.
 
@@ -211,5 +237,6 @@ invalid_parameters(_Config) ->
 not_found(_Config) ->
   ct:comment("Not existing element is not found"),
   #{status_code := 404} = sr_test_utils:api_call(get, "/elements/notfound"),
+  #{status_code := 404} = sr_test_utils:api_call(patch, "/elements/notfound"),
   #{status_code := 404} = sr_test_utils:api_call(delete, "/elements/notfound"),
   {comment, ""}.
