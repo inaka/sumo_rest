@@ -1,5 +1,8 @@
 # Sumo Rest
-Generic cowboy handlers to work with Sumo
+
+<img src="http://www.technovelgy.com/graphics/content/sumo_robot.jpg" align="right" style="float:right" height="400" />
+
+Generic cowboy handlers to work with Sumo DB
 
 ## Introduction
 We, at Inaka, are used to build our RESTful servers on top of [cowboy](https://github.com/ninenines/cowboy). We use [sumo_db](https://github.com/inaka/sumo_db) to manage our persistence and [trails](https://github.com/inaka/cowboy-trails) together with [cowboy-swagger](https://github.com/inaka/cowboy-swagger) for documentation.
@@ -20,6 +23,8 @@ Eventually, all applications shared that same *base_handler*, so we decided to a
 This project dependency tree is a great way to show the architecture behind it.
 
 ![Architecture](https://docs.google.com/drawings/d/1mlJTIxd7mH_48hcWmip_zW6rfzglbmSprpGSsfhjcsM/pub?w=367&amp;h=288)
+
+As you'll see below, **Sumo Rest** gives you _base handlers_ that you can use on your **Cowboy** server to manage your **Sumo DB** entities easily. You just need to define your routes using **Trails** and provide proper metadata for each of them. In particular, you need to provide the same basic metadata **Swagger** requires. You can manually use the base handlers and call each of their functions when you need them, but you can also use **Mixer** to just _bring_ their functions to your own handlers easily.
 
 ## Example App
 For an example on how to use this library, please check [lsl](https://github.com/inaka/lsl)
