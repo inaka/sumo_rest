@@ -5,7 +5,6 @@
     [ kernel
     , stdlib
     , crypto
-    , inets
     , sasl
 
     , cowboy
