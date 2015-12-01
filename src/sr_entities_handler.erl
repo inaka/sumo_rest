@@ -119,7 +119,7 @@ handle_post(Entity, Req1, State) ->
   PersistedEntity = sumo:persist(Model, Entity),
   ResBody = sr_json:encode(Model:to_json(PersistedEntity)),
   Req2 = cowboy_req:set_resp_body(ResBody, Req1),
-  Location = iolist_to_binary([Path, Model:uri_path(PersistedEntity)]),
+  Location = iolist_to_binary([Path, $/, Model:uri_path(PersistedEntity)]),
   {{true, Location}, Req2, State}.
 
 -spec announce_req(cowboy_req:req(), options()) -> cowboy_req:req().
