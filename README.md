@@ -133,7 +133,7 @@ start_phase(create_schema, _StartType, []) ->
 
 #### `start_cowboy_listeners`
 Let's go step by step on this one.
-Since we're using **Trails**, we can let each module define its own ~routes~ trails.
+Since we're using **Trails**, we can let each module define its own ~~routes~~ trails.
 
 ## A Full-Fledged App
 For a more elaborated example on how to use this library, please check [lsl](https://github.com/inaka/lsl).
