@@ -4,6 +4,7 @@
 -export([encode/1, decode/1]).
 -export([encode_date/1, decode_date/1]).
 -export([encode_null/1, decode_null/1]).
+-export([error/1]).
 
 -type key() :: binary() | atom().
 -type object() :: #{key() => json()}.
@@ -50,3 +51,6 @@ encode_null(Json) -> Json.
                ; (non_null_json()) -> json().
 decode_null(null) -> undefined;
 decode_null(Json) -> Json.
+
+-spec error(binary()) -> iodata().
+error(Error) -> encode(#{error => Error}).

@@ -83,17 +83,20 @@ handle_post(Req, State) ->
     Json             = sr_json:decode(Body),
     case Model:from_json(Json) of
       {error, Reason} ->
-        Req2 = cowboy_req:set_resp_body(Reason, Req1),
+        Req2 = cowboy_req:set_resp_body(sr_json:error(Reason), Req1),
         {false, Req2, State};
       {ok, Entity} ->
         handle_post(Entity, Req1, State)
     end
   catch
     _:conflict ->
-      {ok, Req3} = cowboy_req:reply(409, [], <<"Duplicated entity">>, Req),
+      {ok, Req3} =
+        cowboy_req:reply(409, [], sr_json:error(<<"Duplicated entity">>), Req),
       {halt, Req3, State};
     _:badjson ->
-      Req3 = cowboy_req:set_resp_body(<<"Malformed JSON request">>, Req),
+      Req3 =
+        cowboy_req:set_resp_body(
+          sr_json:error(<<"Malformed JSON request">>), Req),
       {false, Req3, State}
   end.
 
