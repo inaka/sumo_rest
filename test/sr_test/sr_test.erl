@@ -28,8 +28,6 @@ start_phase(create_schema, _StartType, []) ->
   {ok, _} = application:ensure_all_started(mnesia),
   sumo:create_schema();
 start_phase(start_cowboy_listeners, _StartType, []) ->
-  ok = hack_cowboy_swagger_path(),
-
   Handlers =
     [ sr_elements_handler
     , sr_single_element_handler
@@ -50,23 +48,3 @@ start_phase(start_cowboy_listeners, _StartType, []) ->
 
 -spec stop(atom()) -> ok.
 stop(_State) -> ok.
-
-%% @doc Properly sets cowboy swagger priv path.
-%% @hack Waiting for https://github.com/inaka/cowboy-swagger/issues/26
-%% @todo revert cowboy-swagger workaround
-%%       once https://github.com/inaka/cowboy-swagger/issues/26 is fixed
--spec hack_cowboy_swagger_path() -> ok.
-hack_cowboy_swagger_path() ->
-  CowboySwaggerPriv =
-    case code:priv_dir(cowboy_swagger) of
-      {error, bad_name} ->
-        filename:join(
-          [ filename:dirname(code:which(cowboy_swagger_handler))
-          , ".."
-          , "priv"
-          ]);
-      Path -> Path
-    end,
-  StaticFiles = filename:join(CowboySwaggerPriv, "swagger"),
-  application:set_env(cowboy_swagger, static_files, StaticFiles),
-  ok.
