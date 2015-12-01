@@ -61,6 +61,79 @@ In [sr_test.app](tests/sr_test.app) file you'll find the usual stuff. The only p
   }
 ```
 
+### The configuration
+In [test.config](test/test.config) we added the required configuration for the different apps to work:
+
+#### Swagger
+We just defined the minimum required properties:
+```erlang
+, { cowboy_swagger
+  , [ { global_spec
+      , #{ swagger => "2.0"
+         , info => #{title => "SumoRest Test API"}
+         , basePath => ""
+         }
+      }
+    ]
+  }
+```
+
+#### Mnesia
+We've chosen **Mnesia** as our backend, so we just enabled debug on it (not a requirement, but a nice thing to have on development environments):
+```erlang
+, { mnesia
+  , [{debug, true}]
+  }
+```
+
+#### Sumo DB
+**Sumo DB**'s **Mnesia** backend/store is really easy to set up. We will just have 2 models: _elements_ and _sessions_. We will store them both on **Mnesia**:
+```erlang
+, { sumo_db
+  , [ {wpool_opts, [{overrun_warning, 100}]}
+    , {log_queries, true}
+    , {query_timeout, 30000}
+    , {storage_backends, []}
+    , {stores, [{sr_store_mnesia, sumo_store_mnesia, [{workers, 10}]}]}
+    , { docs
+      , [ {sr_elements, sr_store_mnesia}
+        , {sr_sessions, sr_store_mnesia}
+        ]
+      }
+    , {events, []}
+    ]
+  }
+```
+
+#### SR Test
+Finally we add some extremely naïve configuration to our own app. In our case, just a list of users we'll use for authentication purposes (:warning: **Do NOT do this at home, kids** :warning:):
+```erlang
+, { sr_test
+  , [ {users, [{<<"user1">>, <<"pwd1">>}, {<<"user2">>, <<"pwd2">>}]}
+    ]
+  }
+```
+
+### The application module
+The next step is to come up with the main application module: [sr_test](test/sr_test/sr_test.erl). The interesting bits are all in the start phases.
+
+#### `create_schema`
+For **Sumo DB** to work, we just need to make sure we create the schema. We need to do a little trick to setup **Mnesia** though, because for `create_schema` to properly work, **Mnesia** has to be stopped:
+```erlang
+start_phase(create_schema, _StartType, []) ->
+  _ = application:stop(mnesia),
+  Node = node(),
+  case mnesia:create_schema([Node]) of
+    ok -> ok;
+    {error, {Node, {already_exists, Node}}} -> ok
+  end,
+  {ok, _} = application:ensure_all_started(mnesia),
+  sumo:create_schema();
+```
+
+#### `start_cowboy_listeners`
+Let's go step by step on this one.
+Since we're using **Trails**, we can let each module define its own ~routes~ trails.
 
 ## A Full-Fledged App
 For a more elaborated example on how to use this library, please check [lsl](https://github.com/inaka/lsl).

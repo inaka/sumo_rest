@@ -8,7 +8,6 @@
     , sasl
 
     , cowboy
-    , trails
     , cowboy_swagger
     , jiffy
     , katana
