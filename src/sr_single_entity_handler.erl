@@ -75,7 +75,9 @@ handle_patch(Req, #{entity := Entity} = State) ->
     persist(Model:update(Entity, Json), Req1, State)
   catch
     _:badjson ->
-      Req3 = cowboy_req:set_resp_body(<<"Malformed JSON request">>, Req),
+      Req3 =
+        cowboy_req:set_resp_body(
+          sr_json:error(<<"Malformed JSON request">>), Req),
       {false, Req3, State}
   end.
 
@@ -89,7 +91,9 @@ handle_put(Req, #{entity := Entity} = State) ->
     persist(Model:update(Entity, Json), Req1, State)
   catch
     _:badjson ->
-      Req3 = cowboy_req:set_resp_body(<<"Malformed JSON request">>, Req),
+      Req3 =
+        cowboy_req:set_resp_body(
+          sr_json:error(<<"Malformed JSON request">>), Req),
       {false, Req3, State}
   end;
 handle_put(Req, #{id := Id} = State) ->
@@ -100,7 +104,9 @@ handle_put(Req, #{id := Id} = State) ->
     persist(from_json(Model, Id, Json), Req1, State)
   catch
     _:badjson ->
-      Req3 = cowboy_req:set_resp_body(<<"Malformed JSON request">>, Req),
+      Req3 =
+        cowboy_req:set_resp_body(
+          sr_json:error(<<"Malformed JSON request">>), Req),
       {false, Req3, State}
   end.
 
