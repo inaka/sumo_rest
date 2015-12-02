@@ -1,0 +1,8 @@
+@author Brujo Benavides <elbrujohalcon@inaka.net>
+@copyright 2015 Erlang Solutions Ltd.
+@version 0.0.1
+@title Sumo Rest
+@doc <strong>Sumo Rest</strong> gives you generic <strong>Cowboy</strong>
+     handlers to work with <strong>Sumo DB</strong>
+@reference Check <a href="https://github.com/inaka/sumo_rest">Github</a>
+           for more information.

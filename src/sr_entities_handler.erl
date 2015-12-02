@@ -1,4 +1,4 @@
-%%% @doc Base GET|POST /[entity]s implementation
+%%% @doc Base GET|POST /[entities] implementation
 -module(sr_entities_handler).
 
 -export([ init/3
@@ -25,18 +25,28 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Cowboy Callbacks
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+%% @doc Upgrades to cowboy_rest.
+%%      Basically, just returns <code>{upgrade, protocol, cowboy_rest}</code>
+%% @see cowboy_rest:init/3
 -spec init({atom(), atom()}, cowboy_req:req(), options()) ->
   {upgrade, protocol, cowboy_rest}.
 init(_Transport, _Req, _Opts) ->
   {upgrade, protocol, cowboy_rest}.
 
+%% @doc Announces the Req and moves on.
+%%      If <code>verbose := true</code> in <code>Opts</code> for this handler
+%%      prints out a line indicating that endpoint that was hit.
+%% @see cowboy_rest:rest_init/2
 -spec rest_init(cowboy_req:req(), options()) ->
   {ok, cowboy_req:req(), state()}.
 rest_init(Req, Opts) ->
   Req1 = announce_req(Req, Opts),
   {ok, Req1, #{opts => Opts}}.
 
+%% @doc Retrieves the list of allowed methods from Trails metadata.
+%%      Parses the metadata associated with this path and returns the
+%%      corresponding list of endpoints.
+%% @see cowboy_rest:allowed_methods/2
 -spec allowed_methods(cowboy_req:req(), state()) ->
   {[binary()], cowboy_req:req(), state()}.
 allowed_methods(Req, State) ->
@@ -45,26 +55,37 @@ allowed_methods(Req, State) ->
   Methods = [atom_to_method(Method) || Method <- maps:keys(Metadata)],
   {Methods, Req, State}.
 
+%% @doc Returns <code>false</code> for POST, <code>true</code> otherwise.
+%% @see cowboy_rest:resource_exists/2
 -spec resource_exists(cowboy_req:req(), state()) ->
   {boolean(), cowboy_req:req(), state()}.
 resource_exists(Req, State) ->
   {Method, Req1} = cowboy_req:method(Req),
   {Method =/= <<"POST">>, Req1, State}.
 
+%% @doc Always returns "application/json *" with <code>handle_post</code>.
+%% @see cowboy_rest:content_types_accepted/2
 %% @todo Use swagger's 'consumes' to auto-generate this if possible
-%% @see https://github.com/inaka/sumo_rest/issues/7
+%%       <a href="https://github.com/inaka/sumo_rest/issues/7">Issue</a>
 -spec content_types_accepted(cowboy_req:req(), state()) ->
   {[{{binary(), binary(), '*'}, atom()}], cowboy_req:req(), state()}.
 content_types_accepted(Req, State) ->
   {[{{<<"application">>, <<"json">>, '*'}, handle_post}], Req, State}.
 
+%% @doc Always returns "application/json" with <code>handle_get</code>.
+%% @see cowboy_rest:content_types_provided/2
 %% @todo Use swagger's 'produces' to auto-generate this if possible
-%% @see https://github.com/inaka/sumo_rest/issues/7
+%%       <a href="https://github.com/inaka/sumo_rest/issues/7">Issue</a>
 -spec content_types_provided(cowboy_req:req(), state()) ->
   {[{binary(), atom()}], cowboy_req:req(), state()}.
 content_types_provided(Req, State) ->
   {[{<<"application/json">>, handle_get}], Req, State}.
 
+%% @doc Returns the list of all entities.
+%%      Fetches the entities from <strong>SumoDB</strong> using the
+%%      <code>model</code> provided in the options.
+%% @todo Use query-string as filters.
+%%       <a href="https://github.com/inaka/sumo_rest/issues/8">Issue</a>
 -spec handle_get(cowboy_req:req(), state()) ->
   {iodata(), cowboy_req:req(), state()}.
 handle_get(Req, State) ->
@@ -74,6 +95,9 @@ handle_get(Req, State) ->
   JSON      = sr_json:encode(Reply),
   {JSON, Req, State}.
 
+%% @doc Creates a new entity.
+%%      To parse the body, it uses <code>from_json/2</code> from the
+%%      <code>model</code> provided in the options.
 -spec handle_post(cowboy_req:req(), state()) ->
   {{true, binary()} | false | halt, cowboy_req:req(), state()}.
 handle_post(Req, State) ->
@@ -100,6 +124,8 @@ handle_post(Req, State) ->
       {false, Req3, State}
   end.
 
+%% @doc Persists a new entity.
+%%      The body must have been parsed beforehand.
 -spec handle_post(sumo:user_doc(), cowboy_req:req(), state()) ->
   {{true, binary()}, cowboy_req:req(), state()}.
 handle_post(Entity, Req1, State) ->
@@ -122,6 +148,10 @@ handle_post(Entity, Req1, State) ->
   Location = iolist_to_binary([Path, $/, Model:uri_path(PersistedEntity)]),
   {{true, Location}, Req2, State}.
 
+%% @doc Announces the Req.
+%%      If <code>verbose := true</code> in <code>Opts</code> for this handler
+%%      prints out a line indicating that endpoint that was hit.
+%% @see cowboy_rest:rest_init/2
 -spec announce_req(cowboy_req:req(), options()) -> cowboy_req:req().
 announce_req(Req, #{verbose := true}) ->
   {Method, Req1} = cowboy_req:method(Req),

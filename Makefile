@@ -32,6 +32,8 @@ CT_OPTS += -cover test/cover.spec -vvv -erl_args -boot start_sasl -config ${CONF
 
 SHELL_OPTS += -name ${PROJECT}@`hostname` -config ${CONFIG} -boot start_sasl -s sync
 
+EDOC_OPTS += todo, report_missing_types
+
 quicktests: app
 	@$(MAKE) --no-print-directory app-build test-dir ERLC_OPTS="$(TEST_ERLC_OPTS)"
 	$(verbose) mkdir -p $(CURDIR)/logs/

@@ -32,7 +32,10 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Cowboy Callbacks
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+%% @doc Announces the Req and moves on.
+%%      It extracts the <code>:id</code> binding from the Req and leaves it in
+%%      the <code>id</code> key in the state.
+%% @see cowboy_rest:rest_init/2
 -spec rest_init(cowboy_req:req(), options()) ->
   {ok, cowboy_req:req(), state()}.
 rest_init(Req, Opts) ->
@@ -40,6 +43,12 @@ rest_init(Req, Opts) ->
   {Id, Req2} = cowboy_req:binding(id, Req1),
   {ok, Req2, #{opts => Opts, id => Id}}.
 
+%% @doc Verifies if there is an entity with the given <code>id</code>.
+%%      The provided id must be the value for the id field in
+%%      <strong>SumoDb</strong>. If the entity is found, it's kept in the
+%%      state.
+%% @see cowboy_rest:resource_exists/2
+%% @see sumo:find/2
 -spec resource_exists(cowboy_req:req(), state()) ->
   {boolean(), cowboy_req:req(), state()}.
 resource_exists(Req, State) ->
@@ -49,8 +58,15 @@ resource_exists(Req, State) ->
     Entity -> {true, Req, State#{entity => Entity}}
   end.
 
-%% @todo Use swagger's 'consumes' to auto-generate this if possible
-%% @see https://github.com/inaka/sumo_rest/issues/7
+%% @doc Always returns "application/json *".
+%%      The function depends on the request method, it can be
+%% <ul>
+%%    <li> <code>handle_put</code> </li>
+%%    <li> <code>handle_patch</code> </li>
+%% </ul>
+%% @see cowboy_rest:content_types_accepted/2
+%% @todo Use swagger's 'consumes' to auto-generate this if possible.
+%%       <a href="https://github.com/inaka/sumo_rest/issues/7">Issue</a>
 -spec content_types_accepted(cowboy_req:req(), state()) ->
   {[{{binary(), binary(), '*'}, atom()}], cowboy_req:req(), state()}.
 content_types_accepted(Req, State) ->
@@ -58,6 +74,8 @@ content_types_accepted(Req, State) ->
   Function = method_function(Method),
   {[{{<<"application">>, <<"json">>, '*'}, Function}], Req1, State}.
 
+%% @doc Renders the found entity.
+%% @see resource_exists/2
 -spec handle_get(cowboy_req:req(), state()) ->
   {iodata(), cowboy_req:req(), state()}.
 handle_get(Req, State) ->
@@ -65,6 +83,10 @@ handle_get(Req, State) ->
   ResBody = sr_json:encode(Model:to_json(Entity)),
   {ResBody, Req, State}.
 
+%% @doc Updates the found entity.
+%%      To parse the body, it uses <code>update/2</code> from the
+%%      <code>model</code> provided in the options.
+%% @see resource_exists/2
 -spec handle_patch(cowboy_req:req(), state()) ->
   {{true, binary()} | false | halt, cowboy_req:req(), state()}.
 handle_patch(Req, #{entity := Entity} = State) ->
@@ -81,6 +103,11 @@ handle_patch(Req, #{entity := Entity} = State) ->
       {false, Req3, State}
   end.
 
+%% @doc Updates the entity if found, otherwise it creates a new one.
+%%      To parse the body, it uses either <code>update/2</code> or
+%%      <code>from_json/2</code> (if defined) or <code>from_json/1</code>
+%%      from the <code>model</code> provided in the options.
+%% @see resource_exists/2
 -spec handle_put(cowboy_req:req(), state()) ->
   {{true, binary()} | false | halt, cowboy_req:req(), state()}.
 handle_put(Req, #{entity := Entity} = State) ->
@@ -110,6 +137,8 @@ handle_put(Req, #{id := Id} = State) ->
       {false, Req3, State}
   end.
 
+%% @doc Deletes the found entity.
+%% @see resource_exists/2
 -spec delete_resource(cowboy_req:req(), state()) ->
   {boolean() | halt, cowboy_req:req(), state()}.
 delete_resource(Req, State) ->
