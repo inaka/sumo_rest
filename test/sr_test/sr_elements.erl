@@ -8,8 +8,8 @@
 -type value() :: binary() | iodata().
 
 -opaque element() ::
-  #{ key        => binary()
-   , value      => binary()
+  #{ key        => key()
+   , value      => value()
    , created_at => calendar:datetime()
    , updated_at => calendar:datetime()
    }.

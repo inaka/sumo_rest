@@ -15,8 +15,6 @@ start(_StartType, _Args) ->
   {ok, _} = application:ensure_all_started(sasl),
   {ok, self()}.
 
-%% @todo revert cowboy-swagger workaround
-%%       once https://github.com/inaka/cowboy-swagger/issues/26 is fixed
 -spec start_phase(atom(), application:start_type(), []) -> ok | {error, _}.
 start_phase(create_schema, _StartType, []) ->
   _ = application:stop(mnesia),

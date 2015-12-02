@@ -5,11 +5,9 @@
     [ kernel
     , stdlib
     , crypto
-    , inets
     , sasl
 
     , cowboy
-    , trails
     , cowboy_swagger
     , jiffy
     , katana
