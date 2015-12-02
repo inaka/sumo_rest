@@ -1,8 +1,28 @@
 # Change Log
 
+## [0.1.0](https://github.com/inaka/sumo_rest/tree/0.1.0) (2015-12-02)
+[Full Changelog](https://github.com/inaka/sumo_rest/compare/0.0.1...0.1.0)
+
+**Fixed bugs:**
+
+- Invalid Content-Type for error responses [\#14](https://github.com/inaka/sumo_rest/pull/14) ([elbrujohalcon](https://github.com/elbrujohalcon))
+- Add 'patch' to the allowed methods in atom\_to\_method [\#13](https://github.com/inaka/sumo_rest/pull/13) ([elbrujohalcon](https://github.com/elbrujohalcon))
+
+**Closed issues:**
+
+- Create a sample application [\#5](https://github.com/inaka/sumo_rest/issues/5)
+- Fulfil the open-source checklist [\#1](https://github.com/inaka/sumo_rest/issues/1)
+
+**Merged pull requests:**
+
+- README [\#16](https://github.com/inaka/sumo_rest/pull/16) ([elbrujohalcon](https://github.com/elbrujohalcon))
+- \[\#1\] Initial step [\#15](https://github.com/inaka/sumo_rest/pull/15) ([elbrujohalcon](https://github.com/elbrujohalcon))
+- Update cowboy-swagger dep and remove the hack [\#12](https://github.com/inaka/sumo_rest/pull/12) ([elbrujohalcon](https://github.com/elbrujohalcon))
+
 ## [0.0.1](https://github.com/inaka/sumo_rest/tree/0.0.1) (2015-11-28)
 **Merged pull requests:**
 
+- Release Version 0.0.1 [\#11](https://github.com/inaka/sumo_rest/pull/11) ([elbrujohalcon](https://github.com/elbrujohalcon))
 - Reach 100% Code Coverage on Tests [\#10](https://github.com/inaka/sumo_rest/pull/10) ([elbrujohalcon](https://github.com/elbrujohalcon))
 - Create sumo\_single\_entity\_handler [\#4](https://github.com/inaka/sumo_rest/pull/4) ([elbrujohalcon](https://github.com/elbrujohalcon))
 - Create sumo\_entities\_handler [\#3](https://github.com/inaka/sumo_rest/pull/3) ([elbrujohalcon](https://github.com/elbrujohalcon))
