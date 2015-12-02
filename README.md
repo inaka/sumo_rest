@@ -46,6 +46,11 @@ Then you have to create a module that implements the `trails_handler` behaviour 
 
 ## A Basic Example
 You can find a very basic example of the usage of this app in the [tests](tests/sr_test).
+
+The app used for the tests (`sr_test`), makes no sense at all. Don't worry about that. It's just there to provide examples of usage (and of course to run the tests). It basically manages 2 totally independent entities:
+- _elements_: members of an extremely naïve key/value store
+- _sessions_: poorly-designed user sessions :trollface:
+
 Let me walk you through the process of creating such a simple app.
 
 ### The application definition
