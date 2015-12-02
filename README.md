@@ -2,10 +2,10 @@
 
 <img src="http://www.technovelgy.com/graphics/content/sumo_robot.jpg" align="right" style="float:right" height="400" />
 
-Generic cowboy handlers to work with Sumo D
+Generic **Cowboy** handlers to work with **Sumo DB**
 
 ## Introduction
-We, at Inaka, are used to build our RESTful servers on top of [cowboy](https://github.com/ninenines/cowboy). We use [sumo_db](https://github.com/inaka/sumo_db) to manage our persistence and [trails](https://github.com/inaka/cowboy-trails) together with [cowboy-swagger](https://github.com/inaka/cowboy-swagger) for documentation.
+We, at Inaka, build our RESTful servers on top of [cowboy](https://github.com/ninenines/cowboy). We use [sumo_db](https://github.com/inaka/sumo_db) to manage our persistence and [trails](https://github.com/inaka/cowboy-trails) together with [cowboy-swagger](https://github.com/inaka/cowboy-swagger) for documentation.
 
 Soon enough, we realized that we were duplicating code everywhere. Not every endpoint in our APIs is just a CRUD for some entity, but there are definitely lots of them in every server. As an example, most of our servers provide something like the following list of endpoints:
 
@@ -33,10 +33,10 @@ In a nutshell, **Sumo Rest** provides 2 cowboy rest handlers:
     + `POST /entities` - to create a new entity
     + `GET /entitites` - to retrieve the list of all entities
 - [`sr_single_entity_handler`](src/sr_single_entity_handler.erl) that provides implementation for
-    + `GET /entity/:id` - to retrieve an entity
-    + `PUT /entity/:id` - to update (or create) an entity
-    + `PATCH /entity/:id` - to update an entity
-    + `DELETE /entity/:id` - to delete an entity
+    + `GET /entities/:id` - to retrieve an entity
+    + `PUT /entities/:id` - to update (or create) an entity
+    + `PATCH /entities/:id` - to update an entity
+    + `DELETE /entities/:id` - to delete an entity
 
 (Of course, the uris for those endpoints will not be exactly those, you have to define what _entities_ you want to manage.)
 
@@ -365,6 +365,34 @@ handle_post(Req, State) ->
 ```
 
 As you can see we still use `sr_entities_handler:handle_post/3` there, once we're past the parsing stage.
+
+Finally, we did something similar in [`sr_single_session_handler`](test/sr_test/sr_single_session_handler.erl). We needed the same authentication mechanism, so we just _mix_ it _in_:
+```erlang
+-mixin([{ sr_sessions_handler
+        , [ is_authorized/2
+          ]
+        }]).
+```
+
+But we needed to prevent users from accessing other user's sessions, so we implemented `forbidden/2`:
+```erlang
+-spec forbidden(cowboy_req:req(), state()) ->
+  {boolean(), cowboy_req:req(), state()}.
+forbidden(Req, State) ->
+  #{user := {User, _}, id := Id} = State,
+  case sumo:find(sr_sessions, Id) of
+    notfound -> {false, Req, State};
+    Session -> {User =/= sr_sessions:user(Session), Req, State}
+  end.
+```
+
+And, since sessions can not be created with `PUT` (because their keys are auto-generated):
+```erlang
+-spec is_conflict(cowboy_req:req(), state()) ->
+  {boolean(), cowboy_req:req(), state()}.
+is_conflict(Req, State) ->
+  {not maps:is_key(entity, State), Req, State}.
+```
 
 ## A Full-Fledged App
 For a more elaborated example on how to use this library, please check [lsl](https://github.com/inaka/lsl).
