@@ -1,0 +1,121 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Module sr_entities_handler</title>
+<link rel="stylesheet" type="text/css" href="stylesheet.css" title="EDoc">
+</head>
+<body bgcolor="white">
+<div class="navbar"><a name="#navbar_top"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
+<hr>
+
+<h1>Module sr_entities_handler</h1>
+<ul class="index"><li><a href="#description">Description</a></li><li><a href="#types">Data Types</a></li><li><a href="#index">Function Index</a></li><li><a href="#functions">Function Details</a></li></ul>Base GET|POST /[entities] implementation.
+
+
+<h2><a name="description">Description</a></h2>Base GET|POST /[entities] implementation
+<h2><a name="types">Data Types</a></h2>
+
+<h3 class="typedecl"><a name="type-options">options()</a></h3>
+<p><tt>options() = #{path =&gt; string(), model =&gt; module(), verbose =&gt; boolean()}</tt></p>
+
+
+<h3 class="typedecl"><a name="type-state">state()</a></h3>
+<p><tt>state() = #{opts =&gt; <a href="#type-options">options()</a>}</tt></p>
+
+
+<h2><a name="index">Function Index</a></h2>
+<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#allowed_methods-2">allowed_methods/2</a></td><td>Retrieves the list of allowed methods from Trails metadata.</td></tr>
+<tr><td valign="top"><a href="#announce_req-2">announce_req/2</a></td><td>Announces the Req.</td></tr>
+<tr><td valign="top"><a href="#content_types_accepted-2">content_types_accepted/2</a></td><td>Always returns "application/json *" with <code>handle_post</code>.</td></tr>
+<tr><td valign="top"><a href="#content_types_provided-2">content_types_provided/2</a></td><td>Always returns "application/json" with <code>handle_get</code>.</td></tr>
+<tr><td valign="top"><a href="#handle_get-2">handle_get/2</a></td><td>Returns the list of all entities.</td></tr>
+<tr><td valign="top"><a href="#handle_post-2">handle_post/2</a></td><td>Creates a new entity.</td></tr>
+<tr><td valign="top"><a href="#handle_post-3">handle_post/3</a></td><td>Persists a new entity.</td></tr>
+<tr><td valign="top"><a href="#init-3">init/3</a></td><td>Upgrades to cowboy_rest.</td></tr>
+<tr><td valign="top"><a href="#resource_exists-2">resource_exists/2</a></td><td>Returns <code>false</code> for POST, <code>true</code> otherwise.</td></tr>
+<tr><td valign="top"><a href="#rest_init-2">rest_init/2</a></td><td>Announces the Req and moves on.</td></tr>
+</table>
+
+<h2><a name="functions">Function Details</a></h2>
+
+<h3 class="function"><a name="allowed_methods-2">allowed_methods/2</a></h3>
+<div class="spec">
+<p><tt>allowed_methods(Req::<a href="cowboy_req.html#type-req">cowboy_req:req()</a>, State::<a href="#type-state">state()</a>) -&gt; {[binary()], <a href="cowboy_req.html#type-req">cowboy_req:req()</a>, <a href="#type-state">state()</a>}</tt><br></p>
+</div><p>Retrieves the list of allowed methods from Trails metadata.
+       Parses the metadata associated with this path and returns the
+       corresponding list of endpoints.</p>
+<p><b>See also:</b> <a href="cowboy_rest.html#allowed_methods-2">cowboy_rest:allowed_methods/2</a>.</p>
+
+<h3 class="function"><a name="announce_req-2">announce_req/2</a></h3>
+<div class="spec">
+<p><tt>announce_req(Req::<a href="cowboy_req.html#type-req">cowboy_req:req()</a>, Opts::<a href="#type-options">options()</a>) -&gt; <a href="cowboy_req.html#type-req">cowboy_req:req()</a></tt><br></p>
+</div><p>Announces the Req.
+       If <code>verbose := true</code> in <code>Opts</code> for this handler
+       prints out a line indicating that endpoint that was hit.</p>
+<p><b>See also:</b> <a href="cowboy_rest.html#rest_init-2">cowboy_rest:rest_init/2</a>.</p>
+
+<h3 class="function"><a name="content_types_accepted-2">content_types_accepted/2</a></h3>
+<div class="spec">
+<p><tt>content_types_accepted(Req::<a href="cowboy_req.html#type-req">cowboy_req:req()</a>, State::<a href="#type-state">state()</a>) -&gt; {[{{binary(), binary(), '*'}, atom()}], <a href="cowboy_req.html#type-req">cowboy_req:req()</a>, <a href="#type-state">state()</a>}</tt><br></p>
+</div><p>Always returns "application/json *" with <code>handle_post</code>.</p>
+<p><b>See also:</b> <a href="cowboy_rest.html#content_types_accepted-2">cowboy_rest:content_types_accepted/2</a>.</p>
+<p><b><font color="red">To do</font></b><ul><li><font color="red">Use swagger's 'consumes' to auto-generate this if possible
+        <a href="https://github.com/inaka/sumo_rest/issues/7">Issue</a></font></li></ul></p>
+
+<h3 class="function"><a name="content_types_provided-2">content_types_provided/2</a></h3>
+<div class="spec">
+<p><tt>content_types_provided(Req::<a href="cowboy_req.html#type-req">cowboy_req:req()</a>, State::<a href="#type-state">state()</a>) -&gt; {[{binary(), atom()}], <a href="cowboy_req.html#type-req">cowboy_req:req()</a>, <a href="#type-state">state()</a>}</tt><br></p>
+</div><p>Always returns "application/json" with <code>handle_get</code>.</p>
+<p><b>See also:</b> <a href="cowboy_rest.html#content_types_provided-2">cowboy_rest:content_types_provided/2</a>.</p>
+<p><b><font color="red">To do</font></b><ul><li><font color="red">Use swagger's 'produces' to auto-generate this if possible
+        <a href="https://github.com/inaka/sumo_rest/issues/7">Issue</a></font></li></ul></p>
+
+<h3 class="function"><a name="handle_get-2">handle_get/2</a></h3>
+<div class="spec">
+<p><tt>handle_get(Req::<a href="cowboy_req.html#type-req">cowboy_req:req()</a>, State::<a href="#type-state">state()</a>) -&gt; {iodata(), <a href="cowboy_req.html#type-req">cowboy_req:req()</a>, <a href="#type-state">state()</a>}</tt><br></p>
+</div><p>Returns the list of all entities.
+       Fetches the entities from <strong>SumoDB</strong> using the
+       <code>model</code> provided in the options.</p>
+<p><b><font color="red">To do</font></b><ul><li><font color="red">Use query-string as filters.
+        <a href="https://github.com/inaka/sumo_rest/issues/8">Issue</a></font></li></ul></p>
+
+<h3 class="function"><a name="handle_post-2">handle_post/2</a></h3>
+<div class="spec">
+<p><tt>handle_post(Req::<a href="cowboy_req.html#type-req">cowboy_req:req()</a>, State::<a href="#type-state">state()</a>) -&gt; {{true, binary()} | false | halt, <a href="cowboy_req.html#type-req">cowboy_req:req()</a>, <a href="#type-state">state()</a>}</tt><br></p>
+</div><p>Creates a new entity.
+       To parse the body, it uses <code>from_json/2</code> from the
+       <code>model</code> provided in the options.</p>
+
+<h3 class="function"><a name="handle_post-3">handle_post/3</a></h3>
+<div class="spec">
+<p><tt>handle_post(Entity::<a href="sumo.html#type-user_doc">sumo:user_doc()</a>, Req1::<a href="cowboy_req.html#type-req">cowboy_req:req()</a>, State::<a href="#type-state">state()</a>) -&gt; {{true, binary()}, <a href="cowboy_req.html#type-req">cowboy_req:req()</a>, <a href="#type-state">state()</a>}</tt><br></p>
+</div><p>Persists a new entity.
+       The body must have been parsed beforehand.</p>
+
+<h3 class="function"><a name="init-3">init/3</a></h3>
+<div class="spec">
+<p><tt>init(Transport::{atom(), atom()}, Req::<a href="cowboy_req.html#type-req">cowboy_req:req()</a>, Opts::<a href="#type-options">options()</a>) -&gt; {upgrade, protocol, cowboy_rest}</tt><br></p>
+</div><p>Upgrades to cowboy_rest.
+       Basically, just returns <code>{upgrade, protocol, cowboy_rest}</code></p>
+<p><b>See also:</b> <a href="cowboy_rest.html#init-3">cowboy_rest:init/3</a>.</p>
+
+<h3 class="function"><a name="resource_exists-2">resource_exists/2</a></h3>
+<div class="spec">
+<p><tt>resource_exists(Req::<a href="cowboy_req.html#type-req">cowboy_req:req()</a>, State::<a href="#type-state">state()</a>) -&gt; {boolean(), <a href="cowboy_req.html#type-req">cowboy_req:req()</a>, <a href="#type-state">state()</a>}</tt><br></p>
+</div><p>Returns <code>false</code> for POST, <code>true</code> otherwise.</p>
+<p><b>See also:</b> <a href="cowboy_rest.html#resource_exists-2">cowboy_rest:resource_exists/2</a>.</p>
+
+<h3 class="function"><a name="rest_init-2">rest_init/2</a></h3>
+<div class="spec">
+<p><tt>rest_init(Req::<a href="cowboy_req.html#type-req">cowboy_req:req()</a>, Opts::<a href="#type-options">options()</a>) -&gt; {ok, <a href="cowboy_req.html#type-req">cowboy_req:req()</a>, <a href="#type-state">state()</a>}</tt><br></p>
+</div><p>Announces the Req and moves on.
+       If <code>verbose := true</code> in <code>Opts</code> for this handler
+       prints out a line indicating that endpoint that was hit.</p>
+<p><b>See also:</b> <a href="cowboy_rest.html#rest_init-2">cowboy_rest:rest_init/2</a>.</p>
+<hr>
+
+<div class="navbar"><a name="#navbar_bottom"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
+<p><i>Generated by EDoc, Dec 2 2015, 00:05:23.</i></p>
+</body>
+</html>

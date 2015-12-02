@@ -1,0 +1,102 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Module sr_single_entity_handler</title>
+<link rel="stylesheet" type="text/css" href="stylesheet.css" title="EDoc">
+</head>
+<body bgcolor="white">
+<div class="navbar"><a name="#navbar_top"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
+<hr>
+
+<h1>Module sr_single_entity_handler</h1>
+<ul class="index"><li><a href="#description">Description</a></li><li><a href="#types">Data Types</a></li><li><a href="#index">Function Index</a></li><li><a href="#functions">Function Details</a></li></ul>Base GET|PUT|DELETE /[entity]s/:id implementation.
+
+
+<h2><a name="description">Description</a></h2>Base GET|PUT|DELETE /[entity]s/:id implementation
+<h2><a name="types">Data Types</a></h2>
+
+<h3 class="typedecl"><a name="type-options">options()</a></h3>
+<p><tt>options() = #{path =&gt; string(), model =&gt; module(), verbose =&gt; boolean()}</tt></p>
+
+
+<h3 class="typedecl"><a name="type-state">state()</a></h3>
+<p><tt>state() = #{opts =&gt; <a href="#type-options">options()</a>, id =&gt; binary(), entity =&gt; <a href="sumo.html#type-user_doc">sumo:user_doc()</a>}</tt></p>
+
+
+<h2><a name="index">Function Index</a></h2>
+<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#content_types_accepted-2">content_types_accepted/2</a></td><td>Always returns "application/json *".</td></tr>
+<tr><td valign="top"><a href="#delete_resource-2">delete_resource/2</a></td><td>Deletes the found entity.</td></tr>
+<tr><td valign="top"><a href="#handle_get-2">handle_get/2</a></td><td>Renders the found entity.</td></tr>
+<tr><td valign="top"><a href="#handle_patch-2">handle_patch/2</a></td><td>Updates the found entity.</td></tr>
+<tr><td valign="top"><a href="#handle_put-2">handle_put/2</a></td><td>Updates the entity if found, otherwise it creates a new one.</td></tr>
+<tr><td valign="top"><a href="#resource_exists-2">resource_exists/2</a></td><td>Verifies if there is an entity with the given <code>id</code>.</td></tr>
+<tr><td valign="top"><a href="#rest_init-2">rest_init/2</a></td><td>Announces the Req and moves on.</td></tr>
+</table>
+
+<h2><a name="functions">Function Details</a></h2>
+
+<h3 class="function"><a name="content_types_accepted-2">content_types_accepted/2</a></h3>
+<div class="spec">
+<p><tt>content_types_accepted(Req::<a href="cowboy_req.html#type-req">cowboy_req:req()</a>, State::<a href="#type-state">state()</a>) -&gt; {[{{binary(), binary(), '*'}, atom()}], <a href="cowboy_req.html#type-req">cowboy_req:req()</a>, <a href="#type-state">state()</a>}</tt><br></p>
+</div><p>Always returns "application/json *".
+       The function depends on the request method, it can be
+  <ul>
+     <li> <code>handle_put</code> </li>
+     <li> <code>handle_patch</code> </li>
+  </ul></p>
+<p><b>See also:</b> <a href="cowboy_rest.html#content_types_accepted-2">cowboy_rest:content_types_accepted/2</a>.</p>
+<p><b><font color="red">To do</font></b><ul><li><font color="red">Use swagger's 'consumes' to auto-generate this if possible.
+        <a href="https://github.com/inaka/sumo_rest/issues/7">Issue</a></font></li></ul></p>
+
+<h3 class="function"><a name="delete_resource-2">delete_resource/2</a></h3>
+<div class="spec">
+<p><tt>delete_resource(Req::<a href="cowboy_req.html#type-req">cowboy_req:req()</a>, State::<a href="#type-state">state()</a>) -&gt; {boolean() | halt, <a href="cowboy_req.html#type-req">cowboy_req:req()</a>, <a href="#type-state">state()</a>}</tt><br></p>
+</div><p>Deletes the found entity.</p>
+<p><b>See also:</b> <a href="#resource_exists-2">resource_exists/2</a>.</p>
+
+<h3 class="function"><a name="handle_get-2">handle_get/2</a></h3>
+<div class="spec">
+<p><tt>handle_get(Req::<a href="cowboy_req.html#type-req">cowboy_req:req()</a>, State::<a href="#type-state">state()</a>) -&gt; {iodata(), <a href="cowboy_req.html#type-req">cowboy_req:req()</a>, <a href="#type-state">state()</a>}</tt><br></p>
+</div><p>Renders the found entity.</p>
+<p><b>See also:</b> <a href="#resource_exists-2">resource_exists/2</a>.</p>
+
+<h3 class="function"><a name="handle_patch-2">handle_patch/2</a></h3>
+<div class="spec">
+<p><tt>handle_patch(Req::<a href="cowboy_req.html#type-req">cowboy_req:req()</a>, State::<a href="#type-state">state()</a>) -&gt; {{true, binary()} | false | halt, <a href="cowboy_req.html#type-req">cowboy_req:req()</a>, <a href="#type-state">state()</a>}</tt><br></p>
+</div><p>Updates the found entity.
+       To parse the body, it uses <code>update/2</code> from the
+       <code>model</code> provided in the options.</p>
+<p><b>See also:</b> <a href="#resource_exists-2">resource_exists/2</a>.</p>
+
+<h3 class="function"><a name="handle_put-2">handle_put/2</a></h3>
+<div class="spec">
+<p><tt>handle_put(Req::<a href="cowboy_req.html#type-req">cowboy_req:req()</a>, State::<a href="#type-state">state()</a>) -&gt; {{true, binary()} | false | halt, <a href="cowboy_req.html#type-req">cowboy_req:req()</a>, <a href="#type-state">state()</a>}</tt><br></p>
+</div><p>Updates the entity if found, otherwise it creates a new one.
+       To parse the body, it uses either <code>update/2</code> or
+       <code>from_json/2</code> (if defined) or <code>from_json/1</code>
+       from the <code>model</code> provided in the options.</p>
+<p><b>See also:</b> <a href="#resource_exists-2">resource_exists/2</a>.</p>
+
+<h3 class="function"><a name="resource_exists-2">resource_exists/2</a></h3>
+<div class="spec">
+<p><tt>resource_exists(Req::<a href="cowboy_req.html#type-req">cowboy_req:req()</a>, State::<a href="#type-state">state()</a>) -&gt; {boolean(), <a href="cowboy_req.html#type-req">cowboy_req:req()</a>, <a href="#type-state">state()</a>}</tt><br></p>
+</div><p>Verifies if there is an entity with the given <code>id</code>.
+       The provided id must be the value for the id field in
+       <strong>SumoDb</strong>. If the entity is found, it's kept in the
+       state.</p>
+<p><b>See also:</b> <a href="cowboy_rest.html#resource_exists-2">cowboy_rest:resource_exists/2</a>, <a href="sumo.html#find-2">sumo:find/2</a>.</p>
+
+<h3 class="function"><a name="rest_init-2">rest_init/2</a></h3>
+<div class="spec">
+<p><tt>rest_init(Req::<a href="cowboy_req.html#type-req">cowboy_req:req()</a>, Opts::<a href="#type-options">options()</a>) -&gt; {ok, <a href="cowboy_req.html#type-req">cowboy_req:req()</a>, <a href="#type-state">state()</a>}</tt><br></p>
+</div><p>Announces the Req and moves on.
+       It extracts the <code>:id</code> binding from the Req and leaves it in
+       the <code>id</code> key in the state.</p>
+<p><b>See also:</b> <a href="cowboy_rest.html#rest_init-2">cowboy_rest:rest_init/2</a>.</p>
+<hr>
+
+<div class="navbar"><a name="#navbar_bottom"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
+<p><i>Generated by EDoc, Dec 2 2015, 00:05:23.</i></p>
+</body>
+</html>
