@@ -45,7 +45,7 @@ To use them you first have to define your models, by implementing the behaviours
 Then you have to create a module that implements the `trails_handler` behaviour (from **Trails**) and _mix in_ that module all the functions that you need from the provided handlers.
 
 ## A Basic Example
-You can find a very basic example of the usage of this app in the [tests](tests/sr_test).
+You can find a very basic example of the usage of this app in the [tests](test/sr_test).
 
 The app used for the tests (`sr_test`), makes no sense at all. Don't worry about that. It's just there to provide examples of usage (and of course to run the tests). It basically manages 2 totally independent entities:
 - _elements_: members of an extremely naïve key/value store
@@ -54,7 +54,7 @@ The app used for the tests (`sr_test`), makes no sense at all. Don't worry about
 Let me walk you through the process of creating such a simple app.
 
 ### The application definition
-In [sr_test.app](tests/sr_test.app) file you'll find the usual stuff. The only particular pieces are:
+In [sr_test.app](test/sr_test.app) file you'll find the usual stuff. The only particular pieces are:
 
 * The list of `applications`, which includes `cowboy`, `katana`, `cowboy_swagger` and `sumo_db`.
 * The list of `start_phases`. This is not a requirement, but we've found this is a nice way of getting **Sumo DB** up and running before **Cowboy** starts listening:
