@@ -7,13 +7,16 @@
 -type entity() :: sumo:user_doc().
 -export_type([entity/0]).
 
+-type path() :: string().
+-export_type([path/0]).
+
 -type reason() :: iodata().
 -export_type([reason/0]).
 
 -callback to_json(entity()) -> json().
 -callback from_json(json()) -> {ok, entity()} | {error, reason()}.
 -callback update(entity(), json()) -> {ok, entity()} | {error, reason()}.
--callback uri_path(entity()) -> iodata().
+-callback location(entity(), path()) -> iodata().
 %% it's only needed if dups should raise 409 conflict
 -callback id(entity()) -> term().
 %% it's only needed if ids are not coming in PUT jsons

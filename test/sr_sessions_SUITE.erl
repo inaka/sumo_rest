@@ -17,6 +17,7 @@
         , invalid_headers/1
         , invalid_parameters/1
         , conflict/1
+        , location/1
         ]).
 
 -spec all() -> [atom()].
@@ -161,7 +162,7 @@ invalid_auth(Config) ->
   ct:comment("Sessions can only be modified or deleted by their user"),
   [_, {User2Name, _} | _] = application:get_env(sr_test, users, []),
   SessionId =
-    sr_sessions:uri_path(sumo:persist(sr_sessions, sr_sessions:new(User2Name))),
+    sr_sessions:id(sumo:persist(sr_sessions, sr_sessions:new(User2Name))),
   ForbiddenUri = binary_to_list(<<"/sessions/", SessionId/binary>>),
   {basic_auth, BasicAuth} = lists:keyfind(basic_auth, 1, Config),
   Headers5 = #{basic_auth => BasicAuth},
@@ -185,7 +186,7 @@ invalid_headers(Config) ->
 
   [{User, _} | _] = application:get_env(sr_test, users, []),
   SessionId =
-    sr_sessions:uri_path(sumo:persist(sr_sessions, sr_sessions:new(User))),
+    sr_sessions:id(sumo:persist(sr_sessions, sr_sessions:new(User))),
   SessionUri = binary_to_list(<<"/sessions/", SessionId/binary>>),
 
   ct:comment("content-type must be provided for POST and PUT"),
@@ -217,7 +218,7 @@ invalid_parameters(Config) ->
 
   [{User, _} | _] = application:get_env(sr_test, users, []),
   SessionId =
-    sr_sessions:uri_path(sumo:persist(sr_sessions, sr_sessions:new(User))),
+    sr_sessions:id(sumo:persist(sr_sessions, sr_sessions:new(User))),
   SessionUri = binary_to_list(<<"/sessions/", SessionId/binary>>),
 
   ct:comment("Empty or broken parameters are reported"),
@@ -242,4 +243,26 @@ conflict(Config) ->
   ct:comment("Can't update unexisting session"),
   #{status_code := 409} =
     sr_test_utils:api_call(put, "/sessions/notfound", Headers, #{}),
+  {comment, ""}.
+
+-spec location(st_test_utils:config()) -> {comment, string()}.
+location(Config) ->
+  {basic_auth, BasicAuth} = lists:keyfind(basic_auth, 1, Config),
+  Headers = #{ basic_auth => BasicAuth
+             , <<"content-type">> => <<"application/json">>
+             },
+
+  ct:comment("A session is created"),
+  #{status_code := 201, body := Body1, headers := ResponseHeaders} =
+    sr_test_utils:api_call(post, "/sessions", Headers, #{agent => <<"a1">>}),
+  #{ <<"id">>           := Session1Id
+   , <<"token">>        := _Token1
+   , <<"agent">>        := <<"a1">>
+   , <<"created_at">>   := _CreatedAt1
+   , <<"expires_at">>   := _ExpiresAt1
+   } = sr_json:decode(Body1),
+  ct:comment("and its location header is set correctly"),
+  Location = proplists:get_value(<<"location">>, ResponseHeaders),
+  Location = <<"/sessions/", Session1Id/binary>>,
+
   {comment, ""}.

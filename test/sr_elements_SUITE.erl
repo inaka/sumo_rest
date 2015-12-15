@@ -17,6 +17,7 @@
         , invalid_headers/1
         , invalid_parameters/1
         , not_found/1
+        , location/1
         ]).
 
 -spec all() -> [atom()].
@@ -239,4 +240,22 @@ not_found(_Config) ->
   #{status_code := 404} = sr_test_utils:api_call(get, "/elements/notfound"),
   #{status_code := 404} = sr_test_utils:api_call(patch, "/elements/notfound"),
   #{status_code := 404} = sr_test_utils:api_call(delete, "/elements/notfound"),
+  {comment, ""}.
+
+-spec location(sr_test_utils:config()) -> {comment, string()}.
+location(_Config) ->
+  Headers = #{<<"content-type">> => <<"application/json; charset=utf-8">>},
+
+  ct:comment("Element 1 is created"),
+  Key = <<"element1">>,
+  #{status_code := 201, headers := ResponseHeaders} =
+    sr_test_utils:api_call(
+      post, "/elements", Headers,
+      #{ key   => <<"element1">>
+       , value => <<"val1">>
+       }),
+  ct:comment("and its location header is set correctly"),
+  Location = proplists:get_value(<<"location">>, ResponseHeaders),
+  Location = iolist_to_binary(["/elements/", Key]),
+
   {comment, ""}.

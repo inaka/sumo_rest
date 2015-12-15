@@ -34,7 +34,7 @@
 -export(
   [ to_json/1
   , from_json/1
-  , uri_path/1
+  , location/2
   , id/1
   , update/2
   ]).
@@ -58,7 +58,7 @@ sumo_sleep(Element) -> Element.
 -spec sumo_wakeup(sumo:doc()) -> element().
 sumo_wakeup(Element) -> Element.
 
--spec to_json(element()) -> sumo_rest_doc:json().
+-spec to_json(element()) -> sr_json:json().
 to_json(Element) ->
   #{ key        => maps:get(key, Element)
    , value      => maps:get(value, Element)
@@ -97,8 +97,8 @@ update(Element, Json) ->
       {error, <<"missing field: ", Key/binary>>}
   end.
 
--spec uri_path(element()) -> binary().
-uri_path(Element) -> key(Element).
+-spec location(element(), sumo_rest_doc:path()) -> binary().
+location(Element, Path) -> iolist_to_binary([Path, "/", key(Element)]).
 
 -spec id(element()) -> key().
 id(Element) -> key(Element).
