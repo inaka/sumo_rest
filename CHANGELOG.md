@@ -1,5 +1,18 @@
 # Change Log
 
+## [0.1.1](https://github.com/inaka/sumo_rest/tree/0.1.1) (2015-12-15)
+[Full Changelog](https://github.com/inaka/sumo_rest/compare/0.1.0...0.1.1)
+
+**Closed issues:**
+
+- Path variables are not take in account when building the location header [\#20](https://github.com/inaka/sumo_rest/issues/20)
+- Link to sr\_test.app file is broken [\#18](https://github.com/inaka/sumo_rest/issues/18)
+
+**Merged pull requests:**
+
+- \[Fix \#20\] Rename uri\_path/1 to location/2 and change its functionality... [\#21](https://github.com/inaka/sumo_rest/pull/21) ([harenson](https://github.com/harenson))
+- \[Fix \#18\] repair broken link [\#19](https://github.com/inaka/sumo_rest/pull/19) ([elbrujohalcon](https://github.com/elbrujohalcon))
+
 ## [0.1.0](https://github.com/inaka/sumo_rest/tree/0.1.0) (2015-12-02)
 [Full Changelog](https://github.com/inaka/sumo_rest/compare/0.0.1...0.1.0)
 
@@ -10,23 +23,24 @@
 
 **Closed issues:**
 
-- Create a sample application [\#5](https://github.com/inaka/sumo_rest/issues/5)
 - Fulfil the open-source checklist [\#1](https://github.com/inaka/sumo_rest/issues/1)
+- Create a sample application [\#5](https://github.com/inaka/sumo_rest/issues/5)
 
 **Merged pull requests:**
 
+- Version bump to 0.1.0 [\#17](https://github.com/inaka/sumo_rest/pull/17) ([elbrujohalcon](https://github.com/elbrujohalcon))
 - README [\#16](https://github.com/inaka/sumo_rest/pull/16) ([elbrujohalcon](https://github.com/elbrujohalcon))
 - \[\#1\] Initial step [\#15](https://github.com/inaka/sumo_rest/pull/15) ([elbrujohalcon](https://github.com/elbrujohalcon))
 - Update cowboy-swagger dep and remove the hack [\#12](https://github.com/inaka/sumo_rest/pull/12) ([elbrujohalcon](https://github.com/elbrujohalcon))
+- Reach 100% Code Coverage on Tests [\#10](https://github.com/inaka/sumo_rest/pull/10) ([elbrujohalcon](https://github.com/elbrujohalcon))
+- Create sumo\_single\_entity\_handler [\#4](https://github.com/inaka/sumo_rest/pull/4) ([elbrujohalcon](https://github.com/elbrujohalcon))
+- Create sumo\_entities\_handler [\#3](https://github.com/inaka/sumo_rest/pull/3) ([elbrujohalcon](https://github.com/elbrujohalcon))
+- Initial project setup [\#2](https://github.com/inaka/sumo_rest/pull/2) ([elbrujohalcon](https://github.com/elbrujohalcon))
 
 ## [0.0.1](https://github.com/inaka/sumo_rest/tree/0.0.1) (2015-11-28)
 **Merged pull requests:**
 
 - Release Version 0.0.1 [\#11](https://github.com/inaka/sumo_rest/pull/11) ([elbrujohalcon](https://github.com/elbrujohalcon))
-- Reach 100% Code Coverage on Tests [\#10](https://github.com/inaka/sumo_rest/pull/10) ([elbrujohalcon](https://github.com/elbrujohalcon))
-- Create sumo\_single\_entity\_handler [\#4](https://github.com/inaka/sumo_rest/pull/4) ([elbrujohalcon](https://github.com/elbrujohalcon))
-- Create sumo\_entities\_handler [\#3](https://github.com/inaka/sumo_rest/pull/3) ([elbrujohalcon](https://github.com/elbrujohalcon))
-- Initial project setup [\#2](https://github.com/inaka/sumo_rest/pull/2) ([elbrujohalcon](https://github.com/elbrujohalcon))
 
 
 
