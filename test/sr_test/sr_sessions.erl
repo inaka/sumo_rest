@@ -32,6 +32,7 @@
   ]).
 -export(
   [ new/1
+  , unique_id/1
   , token/1
   , user/1
   , user/2
@@ -41,7 +42,7 @@
   [ to_json/1
   , from_json/1
   , from_json/2
-  , uri_path/1
+  , location/2
   , update/2
   ]).
 
@@ -66,7 +67,7 @@ sumo_sleep(Session) -> Session.
 -spec sumo_wakeup(sumo:doc()) -> session().
 sumo_wakeup(Session) -> Session.
 
--spec to_json(session()) -> sumo_rest_doc:json().
+-spec to_json(session()) -> sr_json:json().
 to_json(Session) ->
   #{ id => sr_json:encode_null(maps:get(id, Session))
    , token => maps:get(token, Session)
@@ -112,8 +113,8 @@ update(Session, Json) ->
                           }}
   end.
 
--spec uri_path(session()) -> binary().
-uri_path(#{id := Id}) -> Id.
+-spec location(session(), sumo_rest_doc:path()) -> binary().
+location(Session, Path) -> iolist_to_binary([Path, "/", unique_id(Session)]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% PUBLIC API
@@ -129,6 +130,8 @@ new(User) ->
    , created_at => Now
    , expires_at => expires_at()
    }.
+
+unique_id(#{id := Id}) -> Id.
 
 -spec token(session()) -> token().
 token(#{token := Token}) -> Token.

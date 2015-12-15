@@ -242,10 +242,10 @@ update(Element, Json) ->
   end.
 ```
 
-For **Sumo Rest** to provide urls to the callers, we need to specifiy the uri part that uniquely identifies an element (in our case it's just the key):
+For **Sumo Rest** to provide urls to the callers, we need to specify the location URL:
 ```erlang
--spec uri_path(element()) -> binary().
-uri_path(Element) -> key(Element).
+-spec location(element(), sumo_rest_doc:path()) -> binary().
+location(Element, Path) -> iolist_to_binary([Path, "/", key(Element)]).
 ```
 
 To let **Sumo Rest** avoid duplicate keys (and return `409 Conflict` in that case), we provide the optional callback `id/1`:
