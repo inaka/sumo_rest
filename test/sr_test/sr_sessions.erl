@@ -32,7 +32,7 @@
   ]).
 -export(
   [ new/1
-  , id/1
+  , unique_id/1
   , token/1
   , user/1
   , user/2
@@ -114,7 +114,7 @@ update(Session, Json) ->
   end.
 
 -spec location(session(), sumo_rest_doc:path()) -> binary().
-location(Session, Path) -> iolist_to_binary([Path, "/", id(Session)]).
+location(Session, Path) -> iolist_to_binary([Path, "/", unique_id(Session)]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% PUBLIC API
@@ -131,8 +131,7 @@ new(User) ->
    , expires_at => expires_at()
    }.
 
--spec id(session()) -> id().
-id(#{id := Id}) -> Id.
+unique_id(#{id := Id}) -> Id.
 
 -spec token(session()) -> token().
 token(#{token := Token}) -> Token.

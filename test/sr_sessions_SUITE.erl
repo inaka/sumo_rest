@@ -162,7 +162,9 @@ invalid_auth(Config) ->
   ct:comment("Sessions can only be modified or deleted by their user"),
   [_, {User2Name, _} | _] = application:get_env(sr_test, users, []),
   SessionId =
-    sr_sessions:id(sumo:persist(sr_sessions, sr_sessions:new(User2Name))),
+    sr_sessions:unique_id(sumo:persist( sr_sessions
+                                      , sr_sessions:new(User2Name)
+                                      )),
   ForbiddenUri = binary_to_list(<<"/sessions/", SessionId/binary>>),
   {basic_auth, BasicAuth} = lists:keyfind(basic_auth, 1, Config),
   Headers5 = #{basic_auth => BasicAuth},
@@ -186,7 +188,7 @@ invalid_headers(Config) ->
 
   [{User, _} | _] = application:get_env(sr_test, users, []),
   SessionId =
-    sr_sessions:id(sumo:persist(sr_sessions, sr_sessions:new(User))),
+    sr_sessions:unique_id(sumo:persist(sr_sessions, sr_sessions:new(User))),
   SessionUri = binary_to_list(<<"/sessions/", SessionId/binary>>),
 
   ct:comment("content-type must be provided for POST and PUT"),
@@ -218,7 +220,7 @@ invalid_parameters(Config) ->
 
   [{User, _} | _] = application:get_env(sr_test, users, []),
   SessionId =
-    sr_sessions:id(sumo:persist(sr_sessions, sr_sessions:new(User))),
+    sr_sessions:unique_id(sumo:persist(sr_sessions, sr_sessions:new(User))),
   SessionUri = binary_to_list(<<"/sessions/", SessionId/binary>>),
 
   ct:comment("Empty or broken parameters are reported"),
