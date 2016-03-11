@@ -16,6 +16,7 @@
     , jiffy
     , katana
     , sumo_db
+    , iso8601
     ]},
   {modules, []},
   {env, []}
