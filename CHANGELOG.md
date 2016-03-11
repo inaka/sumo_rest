@@ -1,15 +1,28 @@
 # Change Log
 
+## [0.1.2](https://github.com/inaka/sumo_rest/tree/0.1.2) (2016-03-11)
+[Full Changelog](https://github.com/inaka/sumo_rest/compare/0.1.1...0.1.2)
+
+**Closed issues:**
+
+- Missing iso8601 in sumo\_rest.app.src applications list [\#24](https://github.com/inaka/sumo_rest/issues/24)
+
+**Merged pull requests:**
+
+- \[Fix \#24\] Add iso8601 to the app.src applications list [\#26](https://github.com/inaka/sumo_rest/pull/26) ([harenson](https://github.com/harenson))
+
 ## [0.1.1](https://github.com/inaka/sumo_rest/tree/0.1.1) (2015-12-15)
 [Full Changelog](https://github.com/inaka/sumo_rest/compare/0.1.0...0.1.1)
 
 **Closed issues:**
 
+- Version Bump to 0.1.1 [\#22](https://github.com/inaka/sumo_rest/issues/22)
 - Path variables are not take in account when building the location header [\#20](https://github.com/inaka/sumo_rest/issues/20)
 - Link to sr\_test.app file is broken [\#18](https://github.com/inaka/sumo_rest/issues/18)
 
 **Merged pull requests:**
 
+- \[Fix \#22\] Bump version to 0.1.1 [\#23](https://github.com/inaka/sumo_rest/pull/23) ([harenson](https://github.com/harenson))
 - \[Fix \#20\] Rename uri\_path/1 to location/2 and change its functionality... [\#21](https://github.com/inaka/sumo_rest/pull/21) ([harenson](https://github.com/harenson))
 - \[Fix \#18\] repair broken link [\#19](https://github.com/inaka/sumo_rest/pull/19) ([elbrujohalcon](https://github.com/elbrujohalcon))
 
