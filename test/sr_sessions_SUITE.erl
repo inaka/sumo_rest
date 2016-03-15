@@ -27,7 +27,7 @@ all() -> sr_test_utils:all(?MODULE).
   sr_test_utils:config().
 init_per_testcase(_, Config) ->
   _ = sumo:delete_all(sr_sessions),
-  [{U, P}|_] = application:get_env(sr_test, users, []),
+  {U, P} = first_user(),
   [{basic_auth, {binary_to_list(U), binary_to_list(P)}} | Config].
 
 -spec end_per_testcase(atom(), sr_test_utils:config()) ->
@@ -186,7 +186,7 @@ invalid_headers(Config) ->
                    , <<"accept">> => <<"text/html">>
                    },
 
-  [{User, _} | _] = application:get_env(sr_test, users, []),
+  {User, _} = first_user(),
   SessionId =
     sr_sessions:unique_id(sumo:persist(sr_sessions, sr_sessions:new(User))),
   SessionUri = binary_to_list(<<"/sessions/", SessionId/binary>>),
@@ -218,7 +218,7 @@ invalid_parameters(Config) ->
               , <<"content-type">> => <<"application/json">>
               },
 
-  [{User, _} | _] = application:get_env(sr_test, users, []),
+  {User, _} = first_user(),
   SessionId =
     sr_sessions:unique_id(sumo:persist(sr_sessions, sr_sessions:new(User))),
   SessionUri = binary_to_list(<<"/sessions/", SessionId/binary>>),
@@ -268,3 +268,8 @@ location(Config) ->
   Location = <<"/sessions/", Session1Id/binary>>,
 
   {comment, ""}.
+
+%% @private
+first_user() ->
+  [{U, P}|_] = application:get_env(sr_test, users, []),
+  {U, P}.
