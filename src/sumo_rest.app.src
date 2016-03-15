@@ -19,5 +19,11 @@
     , iso8601
     ]},
   {modules, []},
-  {env, []}
+  {env, []},
+  {maintainers,["Inaka"]},
+  {licenses,["Apache 2.0"]},
+  {links,[ {"Github", "https://github.com/inaka/sumo_rest"},
+           {"Example", "https://github.com/inaka/canillita"}
+         ]},
+  {build_tools,["erlang.mk", "rebar"]}
  ]}.

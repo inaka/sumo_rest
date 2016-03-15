@@ -80,7 +80,7 @@ get_authorization(Req) ->
   catch
     _:Error ->
       WarnMsg = "Error trying to parse auth: ~p~nStack: ~s",
-      error_logger:warning_msg(WarnMsg, [Error, ktn_debug:ppst()]),
+      error_logger:warning_msg(WarnMsg, [Error, erlang:get_stacktrace()]),
       {not_authenticated, Req}
   end.
 
