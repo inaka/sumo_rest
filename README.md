@@ -269,8 +269,7 @@ First we _mix in_ the functions from `sr_entities_handler`:
 ```erlang
 -include_lib("mixer/include/mixer.hrl").
 -mixin([{ sr_entities_handler
-        , [ init/3
-          , rest_init/2
+        , [ init/2
           , allowed_methods/2
           , resource_exists/2
           , content_types_accepted/2
@@ -358,7 +357,7 @@ handle_post(Req, State) ->
     end
   catch
     _:conflict ->
-      {ok, Req3} =
+      Req3 =
         cowboy_req:reply(409, [], sr_json:error(<<"Duplicated entity">>), Req),
       {halt, Req3, State};
     _:badjson ->
@@ -409,7 +408,7 @@ For **questions** or **general comments** regarding the use of this library,
 please use our public [hipchat room](http://inaka.net/hipchat).
 
 If you find any **bugs** or have a **problem** while using this library, please
-[open an issue](https://github.com/inaka/elvis/issues/new) in this repo
+[open an issue](https://github.com/inaka/sumo_db/issues/new) in this repo
 (or a pull request :)).
 
 And you can check all of our open-source projects at [inaka.github.io](http://inaka.github.io).

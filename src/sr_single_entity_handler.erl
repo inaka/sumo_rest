@@ -78,7 +78,7 @@ handle_get(Req, State) ->
 -spec handle_patch(cowboy_req:req(), state()) ->
   {{true, binary()} | false | halt, cowboy_req:req(), state()}.
 handle_patch(Req, #{entity := Entity} = State) ->
-   #{opts := #{model := Model}} = State,
+  #{opts := #{model := Model}} = State,
   try
     {ok, Body, Req1} = cowboy_req:body(Req),
     Json             = sr_json:decode(Body),
@@ -99,7 +99,7 @@ handle_patch(Req, #{entity := Entity} = State) ->
 -spec handle_put(cowboy_req:req(), state()) ->
   {{true, binary()} | false | halt, cowboy_req:req(), state()}.
 handle_put(Req, #{entity := Entity} = State) ->
-   #{opts := #{model := Model}} = State,
+  #{opts := #{model := Model}} = State,
   try
     {ok, Body, Req1} = cowboy_req:body(Req),
     Json             = sr_json:decode(Body),
