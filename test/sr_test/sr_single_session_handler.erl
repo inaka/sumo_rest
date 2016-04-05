@@ -5,8 +5,7 @@
 
 -include_lib("mixer/include/mixer.hrl").
 -mixin([{ sr_single_entity_handler
-        , [ init/3
-          , rest_init/2
+        , [ init/2
           , allowed_methods/2
           , resource_exists/2
           , content_types_accepted/2
@@ -67,7 +66,9 @@ trails() ->
 -spec forbidden(cowboy_req:req(), state()) ->
   {boolean(), cowboy_req:req(), state()}.
 forbidden(Req, State) ->
-  #{user := {User, _}, id := Id} = State,
+  Id = cowboy_req:binding(id, Req),
+  #{user := {User, _}} = State,
+  %% #{user := {User, _}, id := Id} = State,
   case sumo:find(sr_sessions, Id) of
     notfound -> {false, Req, State};
     Session -> {User =/= sr_sessions:user(Session), Req, State}

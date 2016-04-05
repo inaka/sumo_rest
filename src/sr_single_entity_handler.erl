@@ -3,15 +3,14 @@
 
 -include_lib("mixer/include/mixer.hrl").
 -mixin([{ sr_entities_handler
-        , [ init/3
+        , [ init/2
           , allowed_methods/2
           , content_types_provided/2
           , announce_req/2
           ]
         }]).
 
--export([ rest_init/2
-        , resource_exists/2
+-export([ resource_exists/2
         , content_types_accepted/2
         , handle_get/2
         , handle_put/2
@@ -32,17 +31,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Cowboy Callbacks
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% @doc Announces the Req and moves on.
-%%      It extracts the <code>:id</code> binding from the Req and leaves it in
-%%      the <code>id</code> key in the state.
-%% @see cowboy_rest:rest_init/2
--spec rest_init(cowboy_req:req(), options()) ->
-  {ok, cowboy_req:req(), state()}.
-rest_init(Req, Opts) ->
-  Req1 = announce_req(Req, Opts),
-  {Id, Req2} = cowboy_req:binding(id, Req1),
-  {ok, Req2, #{opts => Opts, id => Id}}.
-
 %% @doc Verifies if there is an entity with the given <code>id</code>.
 %%      The provided id must be the value for the id field in
 %%      <strong>SumoDb</strong>. If the entity is found, it's kept in the
@@ -70,9 +58,9 @@ resource_exists(Req, State) ->
 -spec content_types_accepted(cowboy_req:req(), state()) ->
   {[{{binary(), binary(), '*'}, atom()}], cowboy_req:req(), state()}.
 content_types_accepted(Req, State) ->
-  {Method, Req1} = cowboy_req:method(Req),
+  Method = cowboy_req:method(Req),
   Function = method_function(Method),
-  {[{{<<"application">>, <<"json">>, '*'}, Function}], Req1, State}.
+  {[{{<<"application">>, <<"json">>, '*'}, Function}], Req, State}.
 
 %% @doc Renders the found entity.
 %% @see resource_exists/2
@@ -90,7 +78,7 @@ handle_get(Req, State) ->
 -spec handle_patch(cowboy_req:req(), state()) ->
   {{true, binary()} | false | halt, cowboy_req:req(), state()}.
 handle_patch(Req, #{entity := Entity} = State) ->
-  #{opts := #{model := Model}} = State,
+   #{opts := #{model := Model}} = State,
   try
     {ok, Body, Req1} = cowboy_req:body(Req),
     Json             = sr_json:decode(Body),
@@ -111,7 +99,7 @@ handle_patch(Req, #{entity := Entity} = State) ->
 -spec handle_put(cowboy_req:req(), state()) ->
   {{true, binary()} | false | halt, cowboy_req:req(), state()}.
 handle_put(Req, #{entity := Entity} = State) ->
-  #{opts := #{model := Model}} = State,
+   #{opts := #{model := Model}} = State,
   try
     {ok, Body, Req1} = cowboy_req:body(Req),
     Json             = sr_json:decode(Body),

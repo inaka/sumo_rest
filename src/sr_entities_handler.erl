@@ -1,8 +1,7 @@
 %%% @doc Base GET|POST /[entities] implementation
 -module(sr_entities_handler).
 
--export([ init/3
-        , rest_init/2
+-export([ init/2
         , allowed_methods/2
         , resource_exists/2
         , content_types_accepted/2
@@ -26,22 +25,14 @@
 %%% Cowboy Callbacks
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% @doc Upgrades to cowboy_rest.
-%%      Basically, just returns <code>{upgrade, protocol, cowboy_rest}</code>
-%% @see cowboy_rest:init/3
--spec init({atom(), atom()}, cowboy_req:req(), options()) ->
-  {upgrade, protocol, cowboy_rest}.
-init(_Transport, _Req, _Opts) ->
-  {upgrade, protocol, cowboy_rest}.
-
-%% @doc Announces the Req and moves on.
-%%      If <code>verbose := true</code> in <code>Opts</code> for this handler
-%%      prints out a line indicating that endpoint that was hit.
-%% @see cowboy_rest:rest_init/2
--spec rest_init(cowboy_req:req(), options()) ->
-  {ok, cowboy_req:req(), state()}.
-rest_init(Req, Opts) ->
-  Req1 = announce_req(Req, Opts),
-  {ok, Req1, #{opts => Opts}}.
+%% Returns <code>{cowboy_rest, cowboy_req:req(), options()}</code>
+%% @see cowboy_rest:init/2
+-spec init(cowboy_req:req(), options()) ->
+  {cowboy_rest, cowboy_req:req(), options()}.
+init(Req, Opts) ->
+  ok = announce_req(Req, Opts),
+  Id = cowboy_req:binding(id, Req),
+  {cowboy_rest, Req, #{opts => Opts, id => Id}}.
 
 %% @doc Retrieves the list of allowed methods from Trails metadata.
 %%      Parses the metadata associated with this path and returns the
@@ -60,8 +51,8 @@ allowed_methods(Req, State) ->
 -spec resource_exists(cowboy_req:req(), state()) ->
   {boolean(), cowboy_req:req(), state()}.
 resource_exists(Req, State) ->
-  {Method, Req1} = cowboy_req:method(Req),
-  {Method =/= <<"POST">>, Req1, State}.
+  Method = cowboy_req:method(Req),
+  {Method =/= <<"POST">>, Req, State}.
 
 %% @doc Always returns "application/json *" with <code>handle_post</code>.
 %% @see cowboy_rest:content_types_accepted/2
@@ -114,7 +105,7 @@ handle_post(Req, State) ->
     end
   catch
     _:conflict ->
-      {ok, Req3} =
+      Req3 =
         cowboy_req:reply(409, [], sr_json:error(<<"Duplicated entity">>), Req),
       {halt, Req3, State};
     _:badjson ->
@@ -152,21 +143,21 @@ handle_post(Entity, Req1, State) ->
 %%      If <code>verbose := true</code> in <code>Opts</code> for this handler
 %%      prints out a line indicating that endpoint that was hit.
 %% @see cowboy_rest:rest_init/2
--spec announce_req(cowboy_req:req(), options()) -> cowboy_req:req().
+-spec announce_req(cowboy_req:req(), options()) -> ok.
 announce_req(Req, #{verbose := true}) ->
-  {Method, Req1} = cowboy_req:method(Req),
-  {Path,   Req2} = cowboy_req:path(Req1),
+  Method = cowboy_req:method(Req),
+  Path = cowboy_req:path(Req),
   _ = error_logger:info_msg("~s ~s", [Method, Path]),
-  Req2;
-announce_req(Req, _Opts) -> Req.
+  ok;
+announce_req(_Req, _Opts) -> ok.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Auxiliary Functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 -spec atom_to_method(get|patch|put|post|delete) -> binary().
-atom_to_method(get) -> <<"GET">>;
-atom_to_method(patch) -> <<"PATCH">>;
-atom_to_method(put) -> <<"PUT">>;
-atom_to_method(post) -> <<"POST">>;
+atom_to_method(get)    -> <<"GET">>;
+atom_to_method(patch)  -> <<"PATCH">>;
+atom_to_method(put)    -> <<"PUT">>;
+atom_to_method(post)   -> <<"POST">>;
 atom_to_method(delete) -> <<"DELETE">>.

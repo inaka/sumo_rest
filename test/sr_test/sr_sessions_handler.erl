@@ -5,8 +5,7 @@
 
 -include_lib("mixer/include/mixer.hrl").
 -mixin([{ sr_entities_handler
-        , [ init/3
-          , rest_init/2
+        , [ init/2
           , allowed_methods/2
           , resource_exists/2
           , content_types_accepted/2
@@ -66,17 +65,17 @@ is_authorized(Req, State) ->
   | {not_authenticated, cowboy_req:req()}.
 get_authorization(Req) ->
   try cowboy_req:parse_header(<<"authorization">>, Req) of
-    {ok, {<<"basic">>, {Key, Secret}}, Req1} ->
-      {{Key, Secret}, Req1};
-    {ok, Value, Req1} ->
-      WarnMsg = "Invalid basic authentication: ~p~n",
-      error_logger:warning_msg(WarnMsg, [Value]),
-      {not_authenticated, Req1};
+    {basic, Key, Secret} ->
+      {{Key, Secret}, Req};
     {error, badarg} ->
-      {Hdr, Req1} = cowboy_req:header(<<"authorization">>, Req),
+      Header = cowboy_req:header(<<"authorization">>, Req),
       WarnMsg = "Malformed authorization header: ~p~n",
-      error_logger:warning_msg(WarnMsg, [Hdr]),
-      {not_authenticated, Req1}
+      error_logger:warning_msg(WarnMsg, [Header]),
+      {not_authenticated, Req};
+    WhenOthers ->
+      WarnMsg = "Invalid basic authentication: ~p~n",
+      error_logger:warning_msg(WarnMsg, [WhenOthers]),
+      {not_authenticated, Req}
   catch
     _:Error ->
       WarnMsg = "Error trying to parse auth: ~p~nStack: ~s",
@@ -104,7 +103,7 @@ handle_post(Req, State) ->
     end
   catch
     _:conflict ->
-      {ok, Req3} =
+      Req3 =
         cowboy_req:reply(409, [], sr_json:error(<<"Duplicated entity">>), Req),
       {halt, Req3, State};
     _:badjson ->
