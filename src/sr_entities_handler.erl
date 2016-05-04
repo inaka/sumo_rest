@@ -73,7 +73,7 @@ content_types_accepted(Req, State) ->
   #{opts := #{path := Path}} = State,
   #{metadata := Metadata} = trails:retrieve(Path),
   #{post := Get} = Metadata,
-  #{accepts = Accepts} = Get,
+  #{accepts := Accepts} = Get,
   _ = error_logger:info_msg("Accepted. Accepts:~p", [Accepts]),
   {[{{<<"application">>, <<"json">>, '*'}, handle_post}], Req, State}.
 
@@ -87,7 +87,7 @@ content_types_provided(Req, State) ->
   #{opts := #{path := Path}} = State,
   #{metadata := Metadata} = trails:retrieve(Path),
   #{get := Posts} = Metadata,
-  #{produces = Produces} = Posts,
+  #{produces := Produces} = Posts,
   _ = error_logger:info_msg("Provided. Produces:~p", [Produces]),
   {[{<<"application/json">>, handle_get}], Req, State}.
 
