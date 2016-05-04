@@ -72,7 +72,7 @@ resource_exists(Req, State) ->
 content_types_accepted(Req, State) ->
   #{opts := #{path := Path}} = State,
   #{metadata := Metadata} = trails:retrieve(Path),
-  lager:debug("Accepted. Metadata:~p", [Metadata]),
+  _ = error_logger:info_msg("Accepted. Metadata:~p", [Metadata]),
   {[{{<<"application">>, <<"json">>, '*'}, handle_post}], Req, State}.
 
 %% @doc Always returns "application/json" with <code>handle_get</code>.
@@ -84,7 +84,7 @@ content_types_accepted(Req, State) ->
 content_types_provided(Req, State) ->
   #{opts := #{path := Path}} = State,
   #{metadata := Metadata} = trails:retrieve(Path),
-  lager:debug("Provided. Metadata:~p", [Metadata]),
+  _ = error_logger:info_msg("Accepted. Metadata:~p", [Metadata]),
   {[{<<"application/json">>, handle_get}], Req, State}.
 
 %% @doc Returns the list of all entities.
