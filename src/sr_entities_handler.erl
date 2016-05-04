@@ -87,11 +87,10 @@ content_types_provided(Req, State) ->
     #{opts := #{path := Path}} = State,
     try     
         #{metadata := #{get := #{produces := Produces}}} = trails:retrieve(Path),
-        [First, Second] = string:tokens(Produces, "/"),
         {[{list_to_binary(Produces), handle_get}], Req, State}
     catch
-        _ = error_logger:info_msg("Provided. Produces:~p", [Tokens]),
-        {[{<<"application/json">>, handle_get}], Req, State},
+        _:_ ->
+            {[{<<"application/json">>, handle_get}], Req, State},
     end.
 
 %% @doc Returns the list of all entities.
