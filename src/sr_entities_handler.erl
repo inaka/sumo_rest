@@ -71,7 +71,8 @@ resource_exists(Req, State) ->
   {[{{binary(), binary(), '*'}, atom()}], cowboy_req:req(), state()}.
 content_types_accepted(Req, State) ->
   #{opts := #{path := Path}} = State,
-  #{metadata := #{get := #{produces = Accepts}}} = trails:retrieve(Path),
+  #{metadata := Metadata} = trails:retrieve(Path),
+  #{get := #{produces = Accepts}} = Metadata,
   _ = error_logger:info_msg("Accepted. Accepts:~p", [Accepts]),
   {[{{<<"application">>, <<"json">>, '*'}, handle_post}], Req, State}.
 
@@ -83,7 +84,8 @@ content_types_accepted(Req, State) ->
   {[{binary(), atom()}], cowboy_req:req(), state()}.
 content_types_provided(Req, State) ->
   #{opts := #{path := Path}} = State,
-  #{metadata := #{get := #{produces = Produces}}} = trails:retrieve(Path),
+  #{metadata := Metadata} = trails:retrieve(Path),
+  #{get := #{produces = Produces}} = Metadata,
   _ = error_logger:info_msg("Provided. Produces:~p", [Produces]),
   {[{<<"application/json">>, handle_get}], Req, State}.
 
