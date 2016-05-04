@@ -90,7 +90,7 @@ content_types_provided(Req, State) ->
         {[{list_to_binary(Produces), handle_get}], Req, State}
     catch
         _:_ ->
-            {[{<<"application/json">>, handle_get}], Req, State},
+            {[{<<"application/json">>, handle_get}], Req, State}
     end.
 
 %% @doc Returns the list of all entities.
