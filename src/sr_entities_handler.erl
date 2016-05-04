@@ -84,12 +84,15 @@ content_types_accepted(Req, State) ->
 -spec content_types_provided(cowboy_req:req(), state()) ->
   {[{binary(), atom()}], cowboy_req:req(), state()}.
 content_types_provided(Req, State) ->
-  #{opts := #{path := Path}} = State,
-  #{metadata := Metadata} = trails:retrieve(Path),
-  #{get := Posts} = Metadata,
-  #{produces := Produces} = Posts,
-  _ = error_logger:info_msg("Provided. Produces:~p", [Produces]),
-  {[{<<"application/json">>, handle_get}], Req, State}.
+    #{opts := #{path := Path}} = State,
+    try     
+        #{metadata := #{get := #{produces := Produces}}} = trails:retrieve(Path),
+        [First, Second] = string:tokens(Produces, "/"),
+        {[{list_to_binary(Produces), handle_get}], Req, State}
+    catch
+        _ = error_logger:info_msg("Provided. Produces:~p", [Tokens]),
+        {[{<<"application/json">>, handle_get}], Req, State},
+    end.
 
 %% @doc Returns the list of all entities.
 %%      Fetches the entities from <strong>SumoDB</strong> using the
