@@ -50,6 +50,10 @@ success_scenario(_Config) ->
       #{ key   => <<"element1">>
        , value => <<"val1">>
        }),
+  #{ <<"key">>        := <<"element1">>
+   , <<"created_at">> := CreatedAt
+   , <<"updated_at">> := CreatedAt
+   } = Element1 = sr_json:decode(Body1),
 
   ct:comment("Element 1 is modified"),
   #{status_code := 409, body := Body01} =
@@ -58,7 +62,6 @@ success_scenario(_Config) ->
       #{ key   => <<"element1">>
        , value => <<"val1">>
        }),
-
   #{ <<"error">> := <<"Duplicated entity">>
    } = sr_json:decode(Body01),
 
