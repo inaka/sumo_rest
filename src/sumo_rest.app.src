@@ -9,7 +9,6 @@
     , crypto
     , inets
     , sasl
-
     , cowboy
     , trails
     , cowboy_swagger
