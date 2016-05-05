@@ -46,14 +46,14 @@ trails() ->
      , patch =>
        #{ tags => ["elements"]
         , description => "Updates an element"
-        , consumes => ["application/json"]
+        , consumes => ["application/json", "application/json; charset=utf-8"]
         , produces => ["application/json"]
         , parameters => [RequestBody, Id]
         }
      , put =>
        #{ tags => ["elements"]
         , description => "Updates or creates a new element"
-        , consumes => ["application/json"]
+        , consumes => ["application/json", "application/json; charset=utf-8"]
         , produces => ["application/json"]
         , parameters => [RequestBody, Id]
         }

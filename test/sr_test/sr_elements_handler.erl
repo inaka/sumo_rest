@@ -36,7 +36,13 @@ trails() ->
      , post =>
        #{ tags => ["elements"]
         , description => "Creates a new element"
-        , consumes => ["application/json"]
+        , consumes => ["application/json", "application/json; charset=utf-8"]
+        , produces => ["application/json"]
+        , parameters => [RequestBody]
+        }
+     , put =>
+       #{ tags => ["elements"]
+        , description => "Updates an element"
         , produces => ["application/json"]
         , parameters => [RequestBody]
         }

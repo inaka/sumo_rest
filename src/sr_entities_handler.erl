@@ -76,18 +76,12 @@ content_types_accepted(Req, State) ->
         #{metadata := Metadata} = trails:retrieve(Path),
         AtomMethod = method_to_atom(Method),
         #{AtomMethod := #{consumes := Consumes}} = Metadata,
-        Handler = compose_handler_name(handle, AtomMethod),
-        Retlist = lists:foldl(fun(Elem, Accin) ->
-                                      [First, Second] =
-                                          string:tokens(Elem, "/"),
-                                      [{{list_to_binary(First),
-                                        list_to_binary(Second),
-                                        '*'}, Handler} | Accin]
-                              end, [], Consumes),
-        {Retlist, Req2, State}
+        Handler = compose_handler_name(AtomMethod),
+        RetList = [{list_to_binary(X), Handler} || X <- Consumes],
+        {RetList, Req2, State}
     catch
         _:_ ->
-            {[{{<<"application">>, <<"json">>, '*'}, handle_post}], Req2, State}
+            {[{<<"application/json">>, handle_post}], Req, State}
     end.
 
 %% @doc Always returns "application/json" with <code>handle_get</code>.
@@ -103,7 +97,7 @@ content_types_provided(Req, State) ->
         #{metadata := Metadata} = trails:retrieve(Path),
         AtomMethod = method_to_atom(Method),
         #{AtomMethod := #{produces := Produces}} = Metadata,
-        Handler = compose_handler_name(handle, AtomMethod),
+        Handler = compose_handler_name(AtomMethod),
         RetList = [{list_to_binary(X), Handler} || X <- Produces],
         {RetList, Req2, State}
     catch
@@ -208,9 +202,8 @@ method_to_atom(<<"PUT">>) -> put;
 method_to_atom(<<"POST">>) -> post;
 method_to_atom(<<"DELETE">>) -> delete.
 
--spec compose_handler_name(atom(), atom()) -> atom().
-compose_handler_name(handle, get) -> handle_get;
-compose_handler_name(handle, put) -> handle_put;
-compose_handler_name(handle, patch) -> handle_patch;
-compose_handler_name(handle, post) -> handle_post;
-compose_handler_name(handle, delete) -> handle_delete.
+-spec compose_handler_name(get|patch|put|post|delete) -> atom().
+compose_handler_name(get) -> handle_get;
+compose_handler_name(put) -> handle_put;
+compose_handler_name(patch) -> handle_patch;
+compose_handler_name(post) -> handle_post.
