@@ -72,11 +72,14 @@ resource_exists(Req, State) ->
 content_types_accepted(Req, State) ->
     #{opts := #{path := Path}} = State,
     {Method, Req2} = cowboy_req:method(Req),
-    try     
+    try
         #{metadata := Metadata} = trails:retrieve(Path),
         AtomMethod = method_to_atom(Method),
-        #{AtomMethod := #{accepts := Accepts}} = Metadata,
-        {[{Accepts, compose_handler_name(handle, AtomMethod)}], Req2, State}
+        #{AtomMethod := #{consumes := [Consumes]}} = Metadata,
+        [First, Second] = string:tokens(Consumes, "/"),
+        {[{{list_to_binary(First),
+            list_to_binary(Second),
+            '*'}, compose_handler_name(handle, AtomMethod)}], Req2, State}
     catch
         _:_ ->
             {[{{<<"application">>, <<"json">>, '*'}, handle_post}], Req2, State}
