@@ -75,11 +75,16 @@ content_types_accepted(Req, State) ->
     try
         #{metadata := Metadata} = trails:retrieve(Path),
         AtomMethod = method_to_atom(Method),
-        #{AtomMethod := #{consumes := [Consumes]}} = Metadata,
-        [First, Second] = string:tokens(Consumes, "/"),
-        {[{{list_to_binary(First),
-            list_to_binary(Second),
-            '*'}, compose_handler_name(handle, AtomMethod)}], Req2, State}
+        #{AtomMethod := #{consumes := Consumes}} = Metadata,
+        Handler = compose_handler_name(handle, AtomMethod),
+        Retlist = lists:foldl(fun(Elem, Accin) ->
+                                      [First, Second] =
+                                          string:tokens(Elem, "/"),
+                                      [{{list_to_binary(First),
+                                        list_to_binary(Second),
+                                        '*'}, Handler} | Accin]
+                              end, [], Consumes),
+        {Retlist, Req2, State}
     catch
         _:_ ->
             {[{{<<"application">>, <<"json">>, '*'}, handle_post}], Req2, State}
@@ -98,9 +103,9 @@ content_types_provided(Req, State) ->
         #{metadata := Metadata} = trails:retrieve(Path),
         AtomMethod = method_to_atom(Method),
         #{AtomMethod := #{produces := Produces}} = Metadata,
-        {[{list_to_binary(Produces), compose_handler_name(handle, AtomMethod)}],
-           Req2,
-           State}
+        Handler = compose_handler_name(handle, AtomMethod),
+        RetList = [{list_to_binary(X), Handler} || X <- Produces],
+        {RetList, Req2, State}
     catch
         _:_ ->
             {[{<<"application/json">>, handle_get}], Req, State}
