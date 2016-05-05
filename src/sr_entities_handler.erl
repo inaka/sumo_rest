@@ -77,11 +77,11 @@ content_types_accepted(Req, State) ->
         AtomMethod = method_to_atom(Method),
         #{AtomMethod := #{consumes := Consumes}} = Metadata,
         Handler = compose_handler_name(AtomMethod),
-        RetList = [{list_to_binary(X), Handler} || X <- Consumes],
+        RetList = [{iolist_to_binary(X), Handler} || X <- Consumes],
         {RetList, Req2, State}
     catch
         _:_ ->
-            {[{<<"application/json">>, handle_post}], Req, State}
+            {[{{<<"application">>, <<"json">>, '*'}, handle_post}], Req, State}
     end.
 
 %% @doc Always returns "application/json" with <code>handle_get</code>.
@@ -98,7 +98,7 @@ content_types_provided(Req, State) ->
         AtomMethod = method_to_atom(Method),
         #{AtomMethod := #{produces := Produces}} = Metadata,
         Handler = compose_handler_name(AtomMethod),
-        RetList = [{list_to_binary(X), Handler} || X <- Produces],
+        RetList = [{iolist_to_binary(X), Handler} || X <- Produces],
         {RetList, Req2, State}
     catch
         _:_ ->
@@ -202,7 +202,7 @@ method_to_atom(<<"PUT">>) -> put;
 method_to_atom(<<"POST">>) -> post;
 method_to_atom(<<"DELETE">>) -> delete.
 
--spec compose_handler_name(get|patch|put|post|delete) -> atom().
+-spec compose_handler_name(get|patch|put|post) -> atom().
 compose_handler_name(get) -> handle_get;
 compose_handler_name(put) -> handle_put;
 compose_handler_name(patch) -> handle_patch;
