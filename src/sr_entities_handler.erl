@@ -71,7 +71,7 @@ resource_exists(Req, State) ->
   {[{{binary(), binary(), '*'}, atom()}], cowboy_req:req(), state()}.
 content_types_accepted(Req, State) ->
     #{opts := #{path := Path}} = State,
-    {Method, Req2} = cowboy:method(Req),
+    {Method, Req2} = cowboy_req:method(Req),
     try     
         #{metadata := Metadata} = trails:retrieve(Path),
         AtomMethod = method_to_atom(Method),
@@ -90,7 +90,7 @@ content_types_accepted(Req, State) ->
   {[{binary(), atom()}], cowboy_req:req(), state()}.
 content_types_provided(Req, State) ->
     #{opts := #{path := Path}} = State,
-    {Method, Req2} = cowboy:method(Req),
+    {Method, Req2} = cowboy_req:method(Req),
     try
         #{metadata := Metadata} = trails:retrieve(Path),
         AtomMethod = method_to_atom(Method),
