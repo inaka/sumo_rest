@@ -55,6 +55,16 @@ success_scenario(_Config) ->
    , <<"updated_at">> := CreatedAt
    } = Element1 = sr_json:decode(Body1),
 
+  ct:comment("Element 1 is modified"),
+  #{status_code := 409, body := Body01} =
+    sr_test_utils:api_call(
+      put, "/elements", #{<<"content-type">> => <<"application/json">>},
+      #{ key   => <<"element1">>
+       , value => <<"val1">>
+       }),
+  #{ <<"error">> := <<"Duplicated entity">>
+   } = sr_json:decode(Body01),
+
   ct:comment("There is one element now"),
   #{status_code := 200, body := Body2} =
     sr_test_utils:api_call(get, "/elements"),

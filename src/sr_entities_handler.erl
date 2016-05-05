@@ -70,7 +70,19 @@ resource_exists(Req, State) ->
 -spec content_types_accepted(cowboy_req:req(), state()) ->
   {[{{binary(), binary(), '*'}, atom()}], cowboy_req:req(), state()}.
 content_types_accepted(Req, State) ->
-  {[{{<<"application">>, <<"json">>, '*'}, handle_post}], Req, State}.
+    #{opts := #{path := Path}} = State,
+    {Method, Req2} = cowboy_req:method(Req),
+    try
+        #{metadata := Metadata} = trails:retrieve(Path),
+        AtomMethod = method_to_atom(Method),
+        #{AtomMethod := #{consumes := Consumes}} = Metadata,
+        Handler = compose_handler_name(AtomMethod),
+        RetList = [{iolist_to_binary(X), Handler} || X <- Consumes],
+        {RetList, Req2, State}
+    catch
+        _:_ ->
+            {[{{<<"application">>, <<"json">>, '*'}, handle_post}], Req, State}
+    end.
 
 %% @doc Always returns "application/json" with <code>handle_get</code>.
 %% @see cowboy_rest:content_types_provided/2
@@ -79,7 +91,19 @@ content_types_accepted(Req, State) ->
 -spec content_types_provided(cowboy_req:req(), state()) ->
   {[{binary(), atom()}], cowboy_req:req(), state()}.
 content_types_provided(Req, State) ->
-  {[{<<"application/json">>, handle_get}], Req, State}.
+    #{opts := #{path := Path}} = State,
+    {Method, Req2} = cowboy_req:method(Req),
+    try
+        #{metadata := Metadata} = trails:retrieve(Path),
+        AtomMethod = method_to_atom(Method),
+        #{AtomMethod := #{produces := Produces}} = Metadata,
+        Handler = compose_handler_name(AtomMethod),
+        RetList = [{iolist_to_binary(X), Handler} || X <- Produces],
+        {RetList, Req2, State}
+    catch
+        _:_ ->
+            {[{<<"application/json">>, handle_get}], Req, State}
+    end.
 
 %% @doc Returns the list of all entities.
 %%      Fetches the entities from <strong>SumoDB</strong> using the
@@ -170,3 +194,16 @@ atom_to_method(patch) -> <<"PATCH">>;
 atom_to_method(put) -> <<"PUT">>;
 atom_to_method(post) -> <<"POST">>;
 atom_to_method(delete) -> <<"DELETE">>.
+
+-spec method_to_atom(binary()) -> atom().
+method_to_atom(<<"GET">>) -> get;
+method_to_atom(<<"PATCH">>) -> patch;
+method_to_atom(<<"PUT">>) -> put;
+method_to_atom(<<"POST">>) -> post;
+method_to_atom(<<"DELETE">>) -> delete.
+
+-spec compose_handler_name(get|patch|put|post) -> atom().
+compose_handler_name(get) -> handle_get;
+compose_handler_name(put) -> handle_put;
+compose_handler_name(patch) -> handle_patch;
+compose_handler_name(post) -> handle_post.
