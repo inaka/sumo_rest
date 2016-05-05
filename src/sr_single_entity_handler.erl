@@ -6,13 +6,13 @@
         , [ init/3
           , allowed_methods/2
           , content_types_provided/2
+          , content_types_accepted/2
           , announce_req/2
           ]
         }]).
 
 -export([ rest_init/2
         , resource_exists/2
-        , content_types_accepted/2
         , handle_get/2
         , handle_put/2
         , handle_patch/2
@@ -57,22 +57,6 @@ resource_exists(Req, State) ->
     notfound -> {false, Req, State};
     Entity -> {true, Req, State#{entity => Entity}}
   end.
-
-%% @doc Always returns "application/json *".
-%%      The function depends on the request method, it can be
-%% <ul>
-%%    <li> <code>handle_put</code> </li>
-%%    <li> <code>handle_patch</code> </li>
-%% </ul>
-%% @see cowboy_rest:content_types_accepted/2
-%% @todo Use swagger's 'consumes' to auto-generate this if possible.
-%%       <a href="https://github.com/inaka/sumo_rest/issues/7">Issue</a>
--spec content_types_accepted(cowboy_req:req(), state()) ->
-  {[{{binary(), binary(), '*'}, atom()}], cowboy_req:req(), state()}.
-content_types_accepted(Req, State) ->
-  {Method, Req1} = cowboy_req:method(Req),
-  Function = method_function(Method),
-  {[{{<<"application">>, <<"json">>, '*'}, Function}], Req1, State}.
 
 %% @doc Renders the found entity.
 %% @see resource_exists/2
@@ -165,6 +149,3 @@ persist({ok, Entity}, Req1, State) ->
   Req2 = cowboy_req:set_resp_body(ResBody, Req1),
   {true, Req2, State}.
 
--spec method_function(binary()) -> atom().
-method_function(<<"PUT">>) -> handle_put;
-method_function(<<"PATCH">>) -> handle_patch.
