@@ -70,12 +70,17 @@ resource_exists(Req, State) ->
 -spec content_types_accepted(cowboy_req:req(), state()) ->
   {[{{binary(), binary(), '*'}, atom()}], cowboy_req:req(), state()}.
 content_types_accepted(Req, State) ->
-  #{opts := #{path := Path}} = State,
-  #{metadata := Metadata} = trails:retrieve(Path),
-  #{post := Get} = Metadata,
-  #{accepts := Accepts} = Get,
-  _ = error_logger:info_msg("Accepted. Accepts:~p", [Accepts]),
-  {[{{<<"application">>, <<"json">>, '*'}, handle_post}], Req, State}.
+    #{opts := #{path := Path}} = State,
+    {Method, Req2} = cowboy:method(Req),
+    try     
+        #{metadata := Metadata} = trails:retrieve(Path),
+        AtomMethod = method_to_atom(Method),
+        #{AtomMethod := #{accepts := Accepts}} = Metadata,
+        {[{Accepts, compose_handler_name(handle, AtomMethod)}], Req2, State}
+    catch
+        _:_ ->
+            {[{{<<"application">>, <<"json">>, '*'}, handle_post}], Req2, State}
+    end.
 
 %% @doc Always returns "application/json" with <code>handle_get</code>.
 %% @see cowboy_rest:content_types_provided/2
@@ -85,9 +90,14 @@ content_types_accepted(Req, State) ->
   {[{binary(), atom()}], cowboy_req:req(), state()}.
 content_types_provided(Req, State) ->
     #{opts := #{path := Path}} = State,
-    try     
-        #{metadata := #{get := #{produces := Produces}}} = trails:retrieve(Path),
-        {[{list_to_binary(Produces), handle_get}], Req, State}
+    {Method, Req2} = cowboy:method(Req),
+    try
+        #{metadata := Metadata} = trails:retrieve(Path),
+        AtomMethod = method_to_atom(Method),
+        #{AtomMethod := #{produces := Produces}} = Metadata,
+        {[{list_to_binary(Produces), compose_handler_name(handle, AtomMethod)}],
+           Req2,
+           State}
     catch
         _:_ ->
             {[{<<"application/json">>, handle_get}], Req, State}
@@ -182,3 +192,17 @@ atom_to_method(patch) -> <<"PATCH">>;
 atom_to_method(put) -> <<"PUT">>;
 atom_to_method(post) -> <<"POST">>;
 atom_to_method(delete) -> <<"DELETE">>.
+
+-spec method_to_atom(binary()) -> atom().
+method_to_atom(<<"GET">>) -> get;
+method_to_atom(<<"PATCH">>) -> patch;
+method_to_atom(<<"PUT">>) -> put;
+method_to_atom(<<"POST">>) -> post;
+method_to_atom(<<"DELETE">>) -> delete.
+
+-spec compose_handler_name(atom(), atom()) -> atom().
+compose_handler_name(handle, get) -> handle_get;
+compose_handler_name(handle, put) -> handle_put;
+compose_handler_name(handle, patch) -> handle_patch;
+compose_handler_name(handle, post) -> handle_post;
+compose_handler_name(handle, delete) -> handle_delete.
