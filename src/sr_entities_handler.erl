@@ -114,10 +114,16 @@ content_types_provided(Req, State) ->
   {iodata(), cowboy_req:req(), state()}.
 handle_get(Req, State) ->
   #{opts := #{model := Model}} = State,
-  Entities  = sumo:find_all(Model),
+  {Qs, Req1} = cowboy_req:qs_vals(Req),
+  Conditions = [ {binary_to_atom(Name, unicode),
+    Value} || {Name, Value} <- Qs ],
+  Entities = case Conditions of
+    [] -> sumo:find_all(Model);
+    _  -> sumo:find_by(Model, Conditions)
+  end,
   Reply     = [Model:to_json(Entity) || Entity <- Entities],
   JSON      = sr_json:encode(Reply),
-  {JSON, Req, State}.
+  {JSON, Req1, State}.
 
 %% @doc Creates a new entity.
 %%      To parse the body, it uses <code>from_json/2</code> from the
