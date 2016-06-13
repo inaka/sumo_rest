@@ -55,6 +55,15 @@ success_scenario(_Config) ->
    , <<"updated_at">> := CreatedAt
    } = Element1 = sr_json:decode(Body1),
 
+  ct:comment("Find element using query string"),
+  #{status_code := 200, body := BodyA} =
+    sr_test_utils:api_call(get, "/elements?value=val1"),
+  [#{ <<"created_at">> := CreatedAt
+   , <<"key">>        := <<"element1">>
+   , <<"updated_at">> := CreatedAt
+   , <<"value">>      := <<"val1">>
+   }] = sr_json:decode(BodyA),
+
   ct:comment("Element 1 is modified"),
   #{status_code := 409, body := Body01} =
     sr_test_utils:api_call(
