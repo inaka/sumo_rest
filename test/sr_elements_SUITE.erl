@@ -64,6 +64,11 @@ success_scenario(_Config) ->
    , <<"value">>      := <<"val1">>
    }] = sr_json:decode(BodyA),
 
+  ct:comment("Find elements non existent value using query string"),
+  #{status_code := 200, body := BodyB} =
+    sr_test_utils:api_call(get, "/elements?novalue=noval"),
+  [Element1] = sr_json:decode(BodyB),
+
   ct:comment("Element 1 is modified"),
   #{status_code := 409, body := Body01} =
     sr_test_utils:api_call(
