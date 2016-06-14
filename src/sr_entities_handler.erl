@@ -117,7 +117,14 @@ handle_get(Req, State) ->
   {Qs, Req1} = cowboy_req:qs_vals(Req),
   Conditions = [ {binary_to_atom(Name, unicode),
     Value} || {Name, Value} <- Qs ],
-  Entities = case Conditions of
+  Schema = sumo_internal:get_schema(Model),
+  Fields = [ sumo_internal:field_name(Field) ||
+      Field <- sumo_internal:schema_fields(Schema) ],
+  CompareFun = fun({Name, _}) ->
+    true =:= lists:member(Name, Fields)
+  end,
+  ValidConditions = lists:filter(CompareFun, Conditions),
+  Entities = case ValidConditions of
     [] -> sumo:find_all(Model);
     _  -> sumo:find_by(Model, Conditions)
   end,
