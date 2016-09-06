@@ -9,6 +9,7 @@
 -type user() :: binary().
 -type agent() :: binary().
 
+%% Change type per opaque when https://bugs.erlang.org/browse/ERL-249
 -type session() ::
   #{ id => undefined | id()
    , token => token()
@@ -43,7 +44,6 @@
   , from_json/1
   , from_json/2
   , location/2
-  , id/1
   , update/2
   ]).
 
@@ -62,10 +62,10 @@ sumo_schema() ->
     , sumo:new_field(expires_at,  datetime, [not_null])
     ]).
 
--spec sumo_sleep(sumo:user_doc()) -> sumo:model().
+-spec sumo_sleep(session()) -> sumo:model().
 sumo_sleep(Session) -> Session.
 
--spec sumo_wakeup(sumo:model()) -> sumo:user_doc().
+-spec sumo_wakeup(sumo:model()) -> session().
 sumo_wakeup(Session) -> Session.
 
 -spec to_json(session()) -> sr_json:json().
@@ -116,9 +116,6 @@ update(Session, Json) ->
 
 -spec location(session(), sumo_rest_doc:path()) -> binary().
 location(Session, Path) -> iolist_to_binary([Path, "/", unique_id(Session)]).
-
--spec id(session()) -> id() | undefined.
-id(#{id := Id}) -> Id.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% PUBLIC API
