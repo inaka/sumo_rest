@@ -52,10 +52,10 @@ sumo_schema() ->
     , sumo:new_field(updated_at, datetime, [not_null])
     ]).
 
--spec sumo_sleep(element()) -> sumo:doc().
+-spec sumo_sleep(element()) -> sumo:model().
 sumo_sleep(Element) -> Element.
 
--spec sumo_wakeup(sumo:doc()) -> element().
+-spec sumo_wakeup(sumo:model()) -> element().
 sumo_wakeup(Element) -> Element.
 
 -spec to_json(element()) -> sr_json:json().

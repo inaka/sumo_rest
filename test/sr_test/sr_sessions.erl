@@ -9,7 +9,8 @@
 -type user() :: binary().
 -type agent() :: binary().
 
--opaque session() ::
+%% Change type per opaque when https://bugs.erlang.org/browse/ERL-249
+-type session() ::
   #{ id => undefined | id()
    , token => token()
    , agent => undefined | agent()
@@ -61,10 +62,10 @@ sumo_schema() ->
     , sumo:new_field(expires_at,  datetime, [not_null])
     ]).
 
--spec sumo_sleep(session()) -> sumo:doc().
+-spec sumo_sleep(session()) -> sumo:model().
 sumo_sleep(Session) -> Session.
 
--spec sumo_wakeup(sumo:doc()) -> session().
+-spec sumo_wakeup(sumo:model()) -> session().
 sumo_wakeup(Session) -> Session.
 
 -spec to_json(session()) -> sr_json:json().

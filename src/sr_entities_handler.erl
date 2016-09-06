@@ -51,7 +51,8 @@ rest_init(Req, Opts) ->
   {[binary()], cowboy_req:req(), state()}.
 allowed_methods(Req, State) ->
   #{opts := #{path := Path}} = State,
-  #{metadata := Metadata} = trails:retrieve(Path),
+  Trail = trails:retrieve(Path),
+  Metadata = trails:metadata(Trail),
   Methods = [atom_to_method(Method) || Method <- maps:keys(Metadata)],
   {Methods, Req, State}.
 
@@ -73,7 +74,8 @@ content_types_accepted(Req, State) ->
     #{opts := #{path := Path}} = State,
     {Method, Req2} = cowboy_req:method(Req),
     try
-        #{metadata := Metadata} = trails:retrieve(Path),
+        Trail = trails:retrieve(Path),
+        Metadata = trails:metadata(Trail),
         AtomMethod = method_to_atom(Method),
         #{AtomMethod := #{consumes := Consumes}} = Metadata,
         Handler = compose_handler_name(AtomMethod),
@@ -94,7 +96,8 @@ content_types_provided(Req, State) ->
     #{opts := #{path := Path}} = State,
     {Method, Req2} = cowboy_req:method(Req),
     try
-        #{metadata := Metadata} = trails:retrieve(Path),
+        Trail = trails:retrieve(Path),
+        Metadata = trails:metadata(Trail),
         AtomMethod = method_to_atom(Method),
         #{AtomMethod := #{produces := Produces}} = Metadata,
         Handler = compose_handler_name(AtomMethod),

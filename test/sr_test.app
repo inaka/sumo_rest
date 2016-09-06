@@ -6,11 +6,9 @@
     , stdlib
     , crypto
     , sasl
-
     , cowboy
     , cowboy_swagger
     , jiffy
-    , katana
     , sumo_db
     ]},
   {modules, []},

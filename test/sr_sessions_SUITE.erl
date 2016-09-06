@@ -85,7 +85,7 @@ success_scenario(Config) ->
    , <<"expires_at">>   := ExpiresAt3
    } = sr_json:decode(Body3),
   true = ExpiresAt3 >= CreatedAt3,
-  ct:pal("~p < ~p ?", [ExpiresAt3, ExpiresAt2]),
+  ct:log("~p < ~p ?", [ExpiresAt3, ExpiresAt2]),
   true = ExpiresAt3 >= ExpiresAt2,
   true = CreatedAt3 >= CreatedAt1,
   case Session3Id of
