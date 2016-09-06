@@ -56,7 +56,7 @@ is_authorized(Req, State) ->
       case lists:member(User, Users) of
         true -> {true, Req1, State#{user => User}};
         false ->
-          ct:pal("Invalid user ~p not in ~p", [User, Users]),
+          ct:log("Invalid user ~p not in ~p", [User, Users]),
           {{false, auth_header()}, Req1, State}
       end
   end.
@@ -87,9 +87,9 @@ get_authorization(Req) ->
 -spec auth_header() -> binary().
 auth_header() -> <<"Basic Realm=\"Sumo Rest Test\"">>.
 
--spec handle_post(cowboy_req:req(), state()) ->
-  {{true, binary()}, cowboy_req:req(), state()}.
-handle_post(Req, State) ->
+-spec handle_post(cowboy_req:req(), map()) ->
+  {{true, binary()} | false | halt, cowboy_req:req(), state()}.
+handle_post(Req, #{opts := Opts} = State) ->
   #{user := {User, _}} = State,
   try
     {ok, Body, Req1} = cowboy_req:body(Req),
@@ -100,7 +100,8 @@ handle_post(Req, State) ->
         {false, Req2, State};
       {ok, Session} ->
         FullSession = sr_sessions:user(Session, User),
-        sr_entities_handler:handle_post(FullSession, Req1, State)
+        State2 = #{opts => Opts},
+        sr_entities_handler:handle_post(FullSession, Req1, State2)
     end
   catch
     _:conflict ->

@@ -34,6 +34,7 @@
 -export(
   [ to_json/1
   , from_json/1
+  , from_json/2
   , location/2
   , id/1
   , update/2
@@ -52,10 +53,10 @@ sumo_schema() ->
     , sumo:new_field(updated_at, datetime, [not_null])
     ]).
 
--spec sumo_sleep(element()) -> sumo:doc().
+-spec sumo_sleep(sumo:user_doc()) -> sumo:model().
 sumo_sleep(Element) -> Element.
 
--spec sumo_wakeup(sumo:doc()) -> element().
+-spec sumo_wakeup(sumo:model()) -> sumo:user_doc().
 sumo_wakeup(Element) -> Element.
 
 -spec to_json(element()) -> sr_json:json().
@@ -83,6 +84,10 @@ from_json(Json) ->
     _:{badkey, Key} ->
       {error, <<"missing field: ", Key/binary>>}
   end.
+
+-spec from_json(binary(), sumo_rest_doc:json()) ->
+  {ok, sumo:user_doc()} | {error, iodata()}.
+from_json(Id, Json) -> from_json(Json#{<<"id">> => Id}).
 
 -spec update(element(), sumo_rest_doc:json()) ->
   {ok, element()} | {error, iodata()}.

@@ -64,8 +64,8 @@ trails() ->
           },
   [trails:trail(Path, ?MODULE, Opts, Metadata)].
 
--spec forbidden(cowboy_req:req(), state()) ->
-  {boolean(), cowboy_req:req(), state()}.
+-spec forbidden(cowboy_req:req(), map()) ->
+  {boolean(), cowboy_req:req(), map()}.
 forbidden(Req, State) ->
   #{user := {User, _}, id := Id} = State,
   case sumo:find(sr_sessions, Id) of

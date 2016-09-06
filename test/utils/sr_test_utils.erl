@@ -48,19 +48,19 @@ end_per_suite(Config) ->
   ok = shotgun:stop(),
   Config.
 
--spec api_call(atom(), string()) -> #{}.
+-spec api_call(atom(), string()) -> map().
 api_call(Method, Uri) ->
   api_call(Method, Uri, #{}).
 
--spec api_call(atom(), string(), #{}) -> #{}.
+-spec api_call(atom(), string(), map()) -> map().
 api_call(Method, Uri, Headers) ->
   api_call(Method, Uri, Headers, []).
 
--spec api_call(atom(), string(), #{}, #{} | iodata()) -> #{}.
+-spec api_call(atom(), string(), map(), map() | iodata()) -> map().
 api_call(Method, Uri, Headers, Body) ->
   api_call(Method, Uri, Headers, #{}, Body).
 
--spec api_call(atom(), string(), #{}, #{}, #{}|iodata()) -> #{}.
+-spec api_call(atom(), string(), map(), map(), map()|iodata()) -> map().
 api_call(Method, Uri, Headers, Opts, Body) when is_map(Body) ->
   api_call(Method, Uri, Headers, Opts, sr_json:encode(Body));
 api_call(Method, Uri, Headers, Opts, Body) ->
