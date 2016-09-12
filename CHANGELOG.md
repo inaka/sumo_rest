@@ -1,14 +1,43 @@
 # Change Log
 
+## [0.2.0](https://github.com/inaka/sumo_rest/tree/0.2.0) (2016-09-12)
+[Full Changelog](https://github.com/inaka/sumo_rest/compare/0.1.2...0.2.0)
+
+**Fixed bugs:**
+
+- Properly differentiate between sumo\_db's models and modules [\#40](https://github.com/inaka/sumo_rest/pull/40) ([elbrujohalcon](https://github.com/elbrujohalcon))
+
+**Closed issues:**
+
+- Move this project to Rebar3 [\#41](https://github.com/inaka/sumo_rest/issues/41)
+- Upgrade dependencies [\#38](https://github.com/inaka/sumo_rest/issues/38)
+- rebar3 compile -\> failing [\#30](https://github.com/inaka/sumo_rest/issues/30)
+- Update repo and make it ready for hex.pm [\#28](https://github.com/inaka/sumo_rest/issues/28)
+- Hex Package [\#9](https://github.com/inaka/sumo_rest/issues/9)
+- Use query-string for filtering [\#8](https://github.com/inaka/sumo_rest/issues/8)
+- Increase swagger integration [\#7](https://github.com/inaka/sumo_rest/issues/7)
+
+**Merged pull requests:**
+
+- \[\#38\] updated sumo\_db dep and now it is working with OTP-19 [\#39](https://github.com/inaka/sumo_rest/pull/39) ([ferigis](https://github.com/ferigis))
+- Updated readme [\#37](https://github.com/inaka/sumo_rest/pull/37) ([HernanRivasAcosta](https://github.com/HernanRivasAcosta))
+- Handle params in query-string [\#35](https://github.com/inaka/sumo_rest/pull/35) ([zgbjgg](https://github.com/zgbjgg))
+- resolves \#7 [\#33](https://github.com/inaka/sumo_rest/pull/33) ([zsoci](https://github.com/zsoci))
+- \[Fix \#30\] Fix rebar3 compilation by updating swagger, trails and sumo\_db dependencies [\#31](https://github.com/inaka/sumo_rest/pull/31) ([harenson](https://github.com/harenson))
+- \[Fix \#28\] Update dependencies; Update erlang.mk; Add ruleset to elvis config; Add rebar.config file [\#29](https://github.com/inaka/sumo_rest/pull/29) ([harenson](https://github.com/harenson))
+- Make the project rebar3 compatible [\#6](https://github.com/inaka/sumo_rest/pull/6) ([elbrujohalcon](https://github.com/elbrujohalcon))
+
 ## [0.1.2](https://github.com/inaka/sumo_rest/tree/0.1.2) (2016-03-11)
 [Full Changelog](https://github.com/inaka/sumo_rest/compare/0.1.1...0.1.2)
 
 **Closed issues:**
 
+- Bump version to 0.1.2 [\#25](https://github.com/inaka/sumo_rest/issues/25)
 - Missing iso8601 in sumo\_rest.app.src applications list [\#24](https://github.com/inaka/sumo_rest/issues/24)
 
 **Merged pull requests:**
 
+- \[Fix \#25\] Bump version to 0.1.2 [\#27](https://github.com/inaka/sumo_rest/pull/27) ([harenson](https://github.com/harenson))
 - \[Fix \#24\] Add iso8601 to the app.src applications list [\#26](https://github.com/inaka/sumo_rest/pull/26) ([harenson](https://github.com/harenson))
 
 ## [0.1.1](https://github.com/inaka/sumo_rest/tree/0.1.1) (2015-12-15)
