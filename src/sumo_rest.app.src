@@ -23,5 +23,5 @@
   {links,[ {"Github", "https://github.com/inaka/sumo_rest"},
            {"Example", "https://github.com/inaka/canillita"}
          ]},
-  {build_tools,["erlang.mk", "rebar"]}
+  {build_tools,["rebar3"]}
  ]}.
