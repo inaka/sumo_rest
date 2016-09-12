@@ -40,7 +40,7 @@ trails() ->
      },
   Path = "/sessions",
   Opts = #{ path => Path
-          , model => sr_sessions
+          , model => sessions
           , verbose => true
           },
   [trails:trail(Path, ?MODULE, Opts, Metadata)].
@@ -90,7 +90,7 @@ auth_header() -> <<"Basic Realm=\"Sumo Rest Test\"">>.
 -spec handle_post(cowboy_req:req(), map()) ->
   {{true, binary()} | false | halt, cowboy_req:req(), state()}.
 handle_post(Req, #{opts := Opts} = State) ->
-  #{user := {User, _}} = State,
+  #{user := {User, _}, module := Module} = State,
   try
     {ok, Body, Req1} = cowboy_req:body(Req),
     Json             = sr_json:decode(Body),
@@ -100,7 +100,7 @@ handle_post(Req, #{opts := Opts} = State) ->
         {false, Req2, State};
       {ok, Session} ->
         FullSession = sr_sessions:user(Session, User),
-        State2 = #{opts => Opts},
+        State2 = #{opts => Opts, module => Module},
         sr_entities_handler:handle_post(FullSession, Req1, State2)
     end
   catch

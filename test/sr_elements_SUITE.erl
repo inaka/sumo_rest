@@ -26,7 +26,7 @@ all() -> sr_test_utils:all(?MODULE).
 -spec init_per_testcase(atom(), sr_test_utils:config()) ->
   sr_test_utils:config().
 init_per_testcase(_, Config) ->
-  _ = sumo:delete_all(sr_elements),
+  _ = sumo:delete_all(elements),
   Config.
 
 -spec end_per_testcase(atom(), sr_test_utils:config()) ->
@@ -215,7 +215,7 @@ invalid_headers(_Config) ->
 -spec invalid_parameters(sr_test_utils:config()) -> {comment, string()}.
 invalid_parameters(_Config) ->
   Headers = #{<<"content-type">> => <<"application/json">>},
-  _ = sumo:persist(sr_elements, sr_elements:new(<<"key">>, <<"val">>)),
+  _ = sumo:persist(elements, sr_elements:new(<<"key">>, <<"val">>)),
 
   ct:comment("Empty or broken parameters are reported"),
   #{status_code := 400} =

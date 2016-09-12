@@ -65,6 +65,6 @@ trails() ->
      },
   Path = "/elements/:id",
   Opts = #{ path => Path
-          , model => sr_elements
+          , model => elements
           },
   [trails:trail(Path, ?MODULE, Opts, Metadata)].

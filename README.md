@@ -101,8 +101,8 @@ We've chosen **Mnesia** as our backend, so we just enabled debug on it (not a re
     , {storage_backends, []}
     , {stores, [{sr_store_mnesia, sumo_store_mnesia, [{workers, 10}]}]}
     , { docs
-      , [ {sr_elements, sr_store_mnesia}
-        , {sr_sessions, sr_store_mnesia}
+      , [ {elements, sr_store_mnesia, #{module => sr_elements}}
+        , {sessions, sr_store_mnesia, #{module => sr_sessions}}
         ]
       }
     , {events, []}
@@ -183,7 +183,7 @@ The next step is to define our models (i.e. the entities our system will manage)
 ```erlang
 -spec sumo_schema() -> sumo:schema().
 sumo_schema() ->
-  sumo:new_schema(?MODULE,
+  sumo:new_schema(elements,
     [ sumo:new_field(key,        string,   [id, not_null])
     , sumo:new_field(value,      string,   [not_null])
     , sumo:new_field(created_at, datetime, [not_null])
@@ -307,7 +307,7 @@ trails() ->
      },
   Path = "/elements",
   Opts = #{ path => Path
-          , model => sr_elements
+          , model => elements
           },
   [trails:trail(Path, ?MODULE, Opts, Metadata)].
 ```
@@ -385,7 +385,7 @@ But we needed to prevent users from accessing other user's sessions, so we imple
   {boolean(), cowboy_req:req(), state()}.
 forbidden(Req, State) ->
   #{user := {User, _}, id := Id} = State,
-  case sumo:find(sr_sessions, Id) of
+  case sumo:find(sessions, Id) of
     notfound -> {false, Req, State};
     Session -> {User =/= sr_sessions:user(Session), Req, State}
   end.

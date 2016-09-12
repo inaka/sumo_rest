@@ -45,7 +45,7 @@
 
 -spec sumo_schema() -> sumo:schema().
 sumo_schema() ->
-  sumo:new_schema(?MODULE,
+  sumo:new_schema(elements,
     [ sumo:new_field(key,        string,   [id, not_null])
     , sumo:new_field(value,      string,   [not_null])
     , sumo:new_field(created_at, datetime, [not_null])
