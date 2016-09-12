@@ -1,6 +1,6 @@
 {application, sumo_rest, [
   {description, "Generic cowboy handlers to work with Sumo"},
-  {vsn, "0.1.2"},
+  {vsn, "0.2.0"},
   {id, "sumo_rest"},
   {registered, []},
   {applications,
