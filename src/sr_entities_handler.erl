@@ -15,10 +15,11 @@
         ]).
 
 -type options() :: #{ path => string()
-                    , model => module()
+                    , model => atom()
                     , verbose => boolean()
                     }.
 -type state() :: #{ opts => options()
+                  , module => module()
                   }.
 -export_type([state/0, options/0]).
 
@@ -41,7 +42,9 @@ init(_Transport, _Req, _Opts) ->
   {ok, cowboy_req:req(), state()}.
 rest_init(Req, Opts) ->
   Req1 = announce_req(Req, Opts),
-  {ok, Req1, #{opts => Opts}}.
+  #{model := Model} = Opts,
+  Module = sumo_config:get_prop_value(Model, module),
+  {ok, Req1, #{opts => Opts, module => Module}}.
 
 %% @doc Retrieves the list of allowed methods from Trails metadata.
 %%      Parses the metadata associated with this path and returns the
@@ -116,7 +119,9 @@ content_types_provided(Req, State) ->
 -spec handle_get(cowboy_req:req(), state()) ->
   {iodata(), cowboy_req:req(), state()}.
 handle_get(Req, State) ->
-  #{opts := #{model := Model}} = State,
+  #{ opts := #{model := Model}
+   , module := Module
+   } = State,
   {Qs, Req1} = cowboy_req:qs_vals(Req),
   Conditions = [ {binary_to_atom(Name, unicode),
     Value} || {Name, Value} <- Qs ],
@@ -131,7 +136,7 @@ handle_get(Req, State) ->
     [] -> sumo:find_all(Model);
     _  -> sumo:find_by(Model, Conditions)
   end,
-  Reply     = [Model:to_json(Entity) || Entity <- Entities],
+  Reply     = [Module:to_json(Entity) || Entity <- Entities],
   JSON      = sr_json:encode(Reply),
   {JSON, Req1, State}.
 
@@ -141,11 +146,11 @@ handle_get(Req, State) ->
 -spec handle_post(cowboy_req:req(), state()) ->
   {{true, binary()} | false | halt, cowboy_req:req(), state()}.
 handle_post(Req, State) ->
-  #{opts := #{model := Model}} = State,
+  #{module := Module} = State,
   try
     {ok, Body, Req1} = cowboy_req:body(Req),
     Json             = sr_json:decode(Body),
-    case Model:from_json(Json) of
+    case Module:from_json(Json) of
       {error, Reason} ->
         Req2 = cowboy_req:set_resp_body(sr_json:error(Reason), Req1),
         {false, Req2, State};
@@ -169,11 +174,11 @@ handle_post(Req, State) ->
 -spec handle_post(sumo:user_doc(), cowboy_req:req(), state()) ->
   {{true, binary()}, cowboy_req:req(), state()}.
 handle_post(Entity, Req1, State) ->
-  #{opts := #{model := Model, path := Path}} = State,
-  case erlang:function_exported(Model, id, 1) of
+  #{opts := #{model := Model, path := Path}, module := Module} = State,
+  case erlang:function_exported(Module, id, 1) of
     false -> proceed;
     true ->
-      Id = Model:id(Entity),
+      Id = Module:id(Entity),
       case sumo:find(Model, Id) of
         notfound -> proceed;
         Duplicate ->
@@ -183,9 +188,9 @@ handle_post(Entity, Req1, State) ->
       end
   end,
   PersistedEntity = sumo:persist(Model, Entity),
-  ResBody = sr_json:encode(Model:to_json(PersistedEntity)),
+  ResBody = sr_json:encode(Module:to_json(PersistedEntity)),
   Req2 = cowboy_req:set_resp_body(ResBody, Req1),
-  Location = Model:location(PersistedEntity, Path),
+  Location = Module:location(PersistedEntity, Path),
   {{true, Location}, Req2, State}.
 
 %% @doc Announces the Req.

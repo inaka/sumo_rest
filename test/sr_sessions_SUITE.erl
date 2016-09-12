@@ -26,7 +26,7 @@ all() -> sr_test_utils:all(?MODULE).
 -spec init_per_testcase(atom(), sr_test_utils:config()) ->
   sr_test_utils:config().
 init_per_testcase(_, Config) ->
-  _ = sumo:delete_all(sr_sessions),
+  _ = sumo:delete_all(sessions),
   {U, P} = first_user(),
   [{basic_auth, {binary_to_list(U), binary_to_list(P)}} | Config].
 
@@ -43,7 +43,7 @@ success_scenario(Config) ->
              },
 
   ct:comment("There are no sessions"),
-  [] = sumo:find_all(sr_sessions),
+  [] = sumo:find_all(sessions),
 
   ct:comment("A session is created"),
   #{status_code := 201, body := Body1} =
@@ -57,7 +57,7 @@ success_scenario(Config) ->
   true = ExpiresAt1 >= CreatedAt1,
 
   ct:comment("Session ~s is there", [Session1Id]),
-  [Session1] = sumo:find_all(sr_sessions),
+  [Session1] = sumo:find_all(sessions),
   Token1 = sr_sessions:token(Session1),
 
   ct:comment("The session agent can be changed"),
@@ -73,7 +73,7 @@ success_scenario(Config) ->
   true = ExpiresAt2 >= ExpiresAt1,
 
   ct:comment("Still just one session"),
-  [Session2] = sumo:find_all(sr_sessions),
+  [Session2] = sumo:find_all(sessions),
 
   ct:comment("Another session can be created with no agent"),
   #{status_code := 201, body := Body3} =
@@ -98,14 +98,14 @@ success_scenario(Config) ->
   end,
 
   ct:comment("There are 2 sessions"),
-  [Session3] = sumo:find_all(sr_sessions) -- [Session2],
+  [Session3] = sumo:find_all(sessions) -- [Session2],
 
   ct:comment("Session2 is deleted"),
   Uri4 = binary_to_list(<<"/sessions/", Session1Id/binary>>),
   #{status_code := 204} = sr_test_utils:api_call(delete, Uri4, Headers),
 
   ct:comment("One session again"),
-  [Session3] = sumo:find_all(sr_sessions),
+  [Session3] = sumo:find_all(sessions),
 
   ct:comment("DELETE is not idempotent"),
   Uri5 = binary_to_list(<<"/sessions/", Session3Id/binary>>),
@@ -113,7 +113,7 @@ success_scenario(Config) ->
   #{status_code := 404} = sr_test_utils:api_call(delete, Uri5, Headers),
 
   ct:comment("There are no sessions"),
-  [] = sumo:find_all(sr_sessions),
+  [] = sumo:find_all(sessions),
 
   {comment, ""}.
 
@@ -162,9 +162,7 @@ invalid_auth(Config) ->
   ct:comment("Sessions can only be modified or deleted by their user"),
   [_, {User2Name, _} | _] = application:get_env(sr_test, users, []),
   SessionId =
-    sr_sessions:unique_id(sumo:persist( sr_sessions
-                                      , sr_sessions:new(User2Name)
-                                      )),
+    sr_sessions:unique_id(sumo:persist(sessions, sr_sessions:new(User2Name))),
   ForbiddenUri = binary_to_list(<<"/sessions/", SessionId/binary>>),
   {basic_auth, BasicAuth} = lists:keyfind(basic_auth, 1, Config),
   Headers5 = #{basic_auth => BasicAuth},
@@ -188,7 +186,7 @@ invalid_headers(Config) ->
 
   {User, _} = first_user(),
   SessionId =
-    sr_sessions:unique_id(sumo:persist(sr_sessions, sr_sessions:new(User))),
+    sr_sessions:unique_id(sumo:persist(sessions, sr_sessions:new(User))),
   SessionUri = binary_to_list(<<"/sessions/", SessionId/binary>>),
 
   ct:comment("content-type must be provided for POST and PUT"),
@@ -220,7 +218,7 @@ invalid_parameters(Config) ->
 
   {User, _} = first_user(),
   SessionId =
-    sr_sessions:unique_id(sumo:persist(sr_sessions, sr_sessions:new(User))),
+    sr_sessions:unique_id(sumo:persist(sessions, sr_sessions:new(User))),
   SessionUri = binary_to_list(<<"/sessions/", SessionId/binary>>),
 
   ct:comment("Empty or broken parameters are reported"),
