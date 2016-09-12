@@ -1,3 +1,5 @@
+_build/
+compile_commands.json
 sumo_rest.d
 relx
 _rel/
