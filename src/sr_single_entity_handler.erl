@@ -144,7 +144,7 @@ from_json(Module, Id, Json) ->
   end.
 
 persist({error, Reason}, Req, State) ->
-  Req1 = cowboy_req:set_resp_body(Reason, Req),
+  Req1 = cowboy_req:set_resp_body(sr_json:error(Reason), Req),
   {false, Req1, State};
 persist({ok, Entity}, Req1, State) ->
   #{opts := #{model := Model}, module := Module} = State,
