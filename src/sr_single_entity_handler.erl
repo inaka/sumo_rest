@@ -27,6 +27,7 @@
                   , id => binary()
                   , entity => sumo:user_doc()
                   , module => module()
+                  , _ => _
                   }.
 -export_type([state/0, options/0]).
 
@@ -151,4 +152,3 @@ persist({ok, Entity}, Req1, State) ->
   ResBody = sr_json:encode(Module:to_json(PersistedEntity)),
   Req2 = cowboy_req:set_resp_body(ResBody, Req1),
   {true, Req2, State}.
-
