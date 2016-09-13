@@ -20,6 +20,7 @@
                     }.
 -type state() :: #{ opts => options()
                   , module => module()
+                  , _ => _
                   }.
 -export_type([state/0, options/0]).
 
