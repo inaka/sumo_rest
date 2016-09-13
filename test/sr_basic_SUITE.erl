@@ -10,7 +10,7 @@ all() -> sr_test_utils:all(?MODULE).
 types(_Config) ->
   ok = state1(#{any => value}),
   ok = state2(#{any => value}),
-  
+
   {comment, ""}.
 
 -spec state1(sr_entities_handler:state()) -> ok.
