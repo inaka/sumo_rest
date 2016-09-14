@@ -1,5 +1,18 @@
 # Change Log
 
+## [0.2.1](https://github.com/inaka/sumo_rest/tree/0.2.1) (2016-09-14)
+[Full Changelog](https://github.com/inaka/sumo_rest/compare/0.2.0...0.2.1)
+
+**Closed issues:**
+
+- Error results from sumo\_rest\_doc's update callback are improperly handled [\#44](https://github.com/inaka/sumo_rest/issues/44)
+- Add "\_=\>\_" to the state\(\) types [\#43](https://github.com/inaka/sumo_rest/issues/43)
+
+**Merged pull requests:**
+
+- \[\#44\] update error handled with sr\_json:error/1 [\#46](https://github.com/inaka/sumo_rest/pull/46) ([ferigis](https://github.com/ferigis))
+- \[\#43\] state\(\) types fixed [\#45](https://github.com/inaka/sumo_rest/pull/45) ([ferigis](https://github.com/ferigis))
+
 ## [0.2.0](https://github.com/inaka/sumo_rest/tree/0.2.0) (2016-09-12)
 [Full Changelog](https://github.com/inaka/sumo_rest/compare/0.1.2...0.2.0)
 
@@ -25,6 +38,7 @@
 - resolves \#7 [\#33](https://github.com/inaka/sumo_rest/pull/33) ([zsoci](https://github.com/zsoci))
 - \[Fix \#30\] Fix rebar3 compilation by updating swagger, trails and sumo\_db dependencies [\#31](https://github.com/inaka/sumo_rest/pull/31) ([harenson](https://github.com/harenson))
 - \[Fix \#28\] Update dependencies; Update erlang.mk; Add ruleset to elvis config; Add rebar.config file [\#29](https://github.com/inaka/sumo_rest/pull/29) ([harenson](https://github.com/harenson))
+- Version Bump to 0.2.0 [\#42](https://github.com/inaka/sumo_rest/pull/42) ([elbrujohalcon](https://github.com/elbrujohalcon))
 - Make the project rebar3 compatible [\#6](https://github.com/inaka/sumo_rest/pull/6) ([elbrujohalcon](https://github.com/elbrujohalcon))
 
 ## [0.1.2](https://github.com/inaka/sumo_rest/tree/0.1.2) (2016-03-11)
