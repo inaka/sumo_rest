@@ -1,4 +1,5 @@
 _build/
+_checkouts/
 compile_commands.json
 sumo_rest.d
 relx
