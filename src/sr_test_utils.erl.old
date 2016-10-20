@@ -1,0 +1,96 @@
+-module(sr_test_utils).
+
+-export([test/1]).
+
+%%==============================================================================
+%% API
+%%==============================================================================
+-spec test(module()) -> ok.
+test(Handler) ->
+  [Trails] = Handler:trails(),
+
+  Path = trails:path_match(Trails),
+  #{get := Get,
+    post := Post} = Metadata = trails:metadata(Trails),
+
+  % This only works with json for now (make a case later)
+  ContentType = ["application/json"],
+  ContentType = maps:get(produces, Get),
+  ContentType = maps:get(consumes, Post),
+  ContentType = maps:get(produces, Post),
+
+  % Create a new element
+  [RequestBody] = maps:get(parameters, Post),
+  PostSchema = maps:get(schema, RequestBody),
+  % For now, we are only adding the required fields
+  Definitions = maps:get(<<"properties">>, PostSchema),
+  RequiredFields = maps:get(<<"required">>, PostSchema),
+  Json = [build_field(F, Definitions) || F <- RequiredFields],
+
+  io:format("Json: ~p~n", [Json]),
+  R = api_call(Post, Path, [{<<"Content-Type">>, ContentType}], maps:from_list(Json)),
+  io:format("R: ~p~n", [R]),
+
+  ok.
+
+build_field(Field, Definitions) ->
+  {Field, example_for_type(maps:get(<<"type">>, maps:get(Field, Definitions)))}.
+
+api_call(Method, Path) ->
+  api_call(Method, Path, []).
+
+api_call(Method, Path, Hdrs) when is_list(Hdrs) ->
+  api_call(Method, Path, Hdrs, <<>>).
+
+api_call(Method, Path, Hdrs, Json) when is_map(Json) ->
+  api_call(Method, Path, Hdrs, jsx:encode(Json));
+api_call(Method, Path, Headers, Body) ->
+  {ok, Application} = application:get_application(),
+  Port = integer_to_binary(application:get_env(Application, http_port, 8080)),
+  BinPath = iolist_to_binary(Path),
+  Url = <<"http://localhost:", Port/binary, BinPath/binary>>,
+  ct:log("~p ~p -d '~p'", [Method, Url, Body]),
+  try hackney:request(Method, Url, Headers, Body) of
+    {ok, Status, _ResponseHeaders} -> Status;
+    {ok, Status, _ResponseHeaders, ClientRef} ->
+      case hackney:body(ClientRef) of
+        {ok, <<>>} -> Status;
+        {ok, ResponseBody} ->
+          ct:log(">>> ~p", [ResponseBody]),
+          {Status, maybe_decode(ResponseBody)}
+      end;
+    {error, Error} ->
+      ct:fail("Couldnt ~p ~p: ~p", [Method, Path, Error])
+  catch
+    _:X ->
+      ct:log("Error: ~p; Stack: ~p", [X, erlang:get_stacktrace()]),
+      ct:fail("Couldnt ~p ~p: ~p", [Method, Path, X])
+  end.
+
+maybe_decode(RespBody) ->
+  try jsx:decode(RespBody, [return_maps])
+  catch
+    _:_ -> RespBody
+  end.
+
+% This generates semi readable strings
+example_for_type(<<"string">>) ->
+  C = ["b", "c", "d", "f", "g", "h", "j", "k", "l", "m", "n", "p", "q", "r",
+       "s", "t", "v", "w", "x", "y", "z", "bl", "br", "ch", "cl", "gh", "ll",
+       "mn", "pr", "th"],
+  LC = length(C),
+  V = ["a", "e", "i", "o", "u"],
+  LV = length(V),
+
+  RandomC = fun() -> lists:nth(random:uniform(LC), C) end,
+  RandomV = fun() -> lists:nth(random:uniform(LV), V) end,
+
+  Str = [case rand:uniform() > 0.9 of
+           true  -> [RandomC(), RandomV(), RandomV()];
+           false -> [RandomC(), RandomV()]
+         end || _ <- lists:seq(0, rand:uniform(5))],
+  lists:flatten(Str);
+example_for_type(<<"integer">>) ->
+  rand:uniform(1000) - 500;
+example_for_type(<<"float">>) ->
+  rand:uniform() * 1000 - 500.
