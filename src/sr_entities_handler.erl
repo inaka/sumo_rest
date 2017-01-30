@@ -176,15 +176,15 @@ handle_post(Req, State) ->
   {{true, binary()}, cowboy_req:req(), state()}.
 handle_post(Entity, Req1, State) ->
   #{opts := #{model := Model, path := Path}, module := Module} = State,
-  case erlang:function_exported(Module, id, 1) of
+  case erlang:function_exported(Module, duplication_conditions, 1) of
     false -> proceed;
     true ->
-      Id = Module:id(Entity),
-      case sumo:find(Model, Id) of
+      Conditions = Module:duplication_conditions(Entity),
+      case sumo:find_one(Model, Conditions) of
         notfound -> proceed;
         Duplicate ->
-          error_logger:warning_msg(
-            "Duplicated ~p with id ~p: ~p", [Model, Id, Duplicate]),
+          error_logger:warning_msg( "Duplicated ~p with conditions ~p: ~p"
+                                  , [Model, Conditions, Duplicate]),
           throw(conflict)
       end
   end,

@@ -35,7 +35,7 @@
   [ to_json/1
   , from_json/1
   , location/2
-  , id/1
+  , duplication_conditions/1
   , update/2
   ]).
 
@@ -100,8 +100,9 @@ update(Element, Json) ->
 -spec location(element(), sumo_rest_doc:path()) -> binary().
 location(Element, Path) -> iolist_to_binary([Path, "/", key(Element)]).
 
--spec id(element()) -> key().
-id(Element) -> key(Element).
+-spec duplication_conditions(element()) ->
+  sumo_rest_doc:duplication_conditions().
+duplication_conditions(Element) -> [{key, '==', key(Element)}].
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% PUBLIC API
