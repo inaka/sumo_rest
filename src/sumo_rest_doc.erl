@@ -13,13 +13,16 @@
 -type reason() :: iodata().
 -export_type([reason/0]).
 
+-type duplication_conditions() :: sumo:conditions().
+-export_type([duplication_conditions/0]).
+
 -callback to_json(entity()) -> json().
 -callback from_json(json()) -> {ok, entity()} | {error, reason()}.
 -callback update(entity(), json()) -> {ok, entity()} | {error, reason()}.
 -callback location(entity(), path()) -> iodata().
 %% it's only needed if dups should raise 409 conflict
--callback id(entity()) -> term().
+-callback duplication_conditions(entity()) -> duplication_conditions().
 %% it's only needed if ids are not coming in PUT jsons
 -callback from_json(binary(), json()) -> {ok, entity()} | {error, reason()}.
 
--optional_callbacks([id/1, from_json/2]).
+-optional_callbacks([duplication_conditions/1, from_json/2]).
