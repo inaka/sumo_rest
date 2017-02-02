@@ -156,6 +156,7 @@ persist({ok, Entity}, Req1, State) ->
   Req2 = cowboy_req:set_resp_body(ResBody, Req1),
   {true, Req2, State}.
 
+-spec id_from_binding(sumo:field_type(), binary(), atom()) -> term().
 id_from_binding(binary, Id, _) ->
   Id;
 id_from_binding(string, Id, _) ->
