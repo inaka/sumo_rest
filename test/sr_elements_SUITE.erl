@@ -18,6 +18,7 @@
         , invalid_parameters/1
         , not_found/1
         , location/1
+        , binary_id_conversion/1
         ]).
 
 -spec all() -> [atom()].
@@ -47,10 +48,10 @@ success_scenario(_Config) ->
   #{status_code := 201, body := Body1} =
     sr_test_utils:api_call(
       post, "/elements", Headers,
-      #{ key   => <<"element1">>
+      #{ key   => 1
        , value => <<"val1">>
        }),
-  #{ <<"key">>        := <<"element1">>
+  #{ <<"key">>        := 1
    , <<"created_at">> := CreatedAt
    , <<"updated_at">> := CreatedAt
    } = Element1 = sr_json:decode(Body1),
@@ -59,7 +60,7 @@ success_scenario(_Config) ->
   #{status_code := 200, body := BodyA} =
     sr_test_utils:api_call(get, "/elements?value=val1"),
   [#{ <<"created_at">> := CreatedAt
-   , <<"key">>        := <<"element1">>
+   , <<"key">>        := 1
    , <<"updated_at">> := CreatedAt
    , <<"value">>      := <<"val1">>
    }] = sr_json:decode(BodyA),
@@ -73,7 +74,7 @@ success_scenario(_Config) ->
   #{status_code := 409, body := Body01} =
     sr_test_utils:api_call(
       put, "/elements", #{<<"content-type">> => <<"application/json">>},
-      #{ key   => <<"element1">>
+      #{ key   => 1
        , value => <<"val1">>
        }),
   #{ <<"error">> := <<"Duplicated entity">>
@@ -86,17 +87,17 @@ success_scenario(_Config) ->
 
   ct:comment("And we can fetch it"),
   #{status_code := 200, body := Body21} =
-    sr_test_utils:api_call(get, "/elements/element1"),
+    sr_test_utils:api_call(get, "/elements/1"),
   Element1 = sr_json:decode(Body21),
 
   ct:comment("The element value can be changed"),
   #{status_code := 200, body := Body3} =
     sr_test_utils:api_call(
-      put, "/elements/element1", Headers,
-      #{ key => <<"element1">>
+      put, "/elements/1", Headers,
+      #{ key => 1
        , value => <<"newval3">>
        }),
-  #{ <<"key">>        := <<"element1">>
+  #{ <<"key">>        := 1
    , <<"value">>      := <<"newval3">>
    , <<"created_at">> := CreatedAt
    , <<"updated_at">> := UpdatedAt
@@ -111,8 +112,8 @@ success_scenario(_Config) ->
   ct:comment("The element value can be changed by PATCH"),
   #{status_code := 200, body := Body5} =
     sr_test_utils:api_call(
-      patch, "/elements/element1", Headers, #{value => <<"newval5">>}),
-  #{ <<"key">>        := <<"element1">>
+      patch, "/elements/1", Headers, #{value => <<"newval5">>}),
+  #{ <<"key">>        := 1
    , <<"value">>      := <<"newval5">>
    , <<"created_at">> := CreatedAt
    , <<"updated_at">> := UpdatedAt5
@@ -127,11 +128,11 @@ success_scenario(_Config) ->
   ct:comment("Elements can be created by PUT"),
   #{status_code := 201, body := Body7} =
     sr_test_utils:api_call(
-      put, "/elements/element2", Headers,
-      #{ key => <<"element2">>
+      put, "/elements/2", Headers,
+      #{ key => 2
        , value => <<"val2">>
        }),
-  #{ <<"key">>        := <<"element2">>
+  #{ <<"key">>        := 2
    , <<"value">>      := <<"val2">>
    , <<"created_at">> := CreatedAt7
    , <<"updated_at">> := CreatedAt7
@@ -144,7 +145,7 @@ success_scenario(_Config) ->
   [Element7] = sr_json:decode(Body8) -- [Element5],
 
   ct:comment("Element1 is deleted"),
-  #{status_code := 204} = sr_test_utils:api_call(delete, "/elements/element1"),
+  #{status_code := 204} = sr_test_utils:api_call(delete, "/elements/1"),
 
   ct:comment("One element again"),
   #{status_code := 200, body := Body9} =
@@ -152,8 +153,8 @@ success_scenario(_Config) ->
   [Element7] = sr_json:decode(Body9),
 
   ct:comment("DELETE is not idempotent"),
-  #{status_code := 204} = sr_test_utils:api_call(delete, "/elements/element2"),
-  #{status_code := 404} = sr_test_utils:api_call(delete, "/elements/element2"),
+  #{status_code := 204} = sr_test_utils:api_call(delete, "/elements/2"),
+  #{status_code := 404} = sr_test_utils:api_call(delete, "/elements/2"),
 
   ct:comment("There are no elements"),
   #{status_code := 200, body := Body10} =
@@ -215,7 +216,7 @@ invalid_headers(_Config) ->
 -spec invalid_parameters(sr_test_utils:config()) -> {comment, string()}.
 invalid_parameters(_Config) ->
   Headers = #{<<"content-type">> => <<"application/json">>},
-  _ = sumo:persist(elements, sr_elements:new(<<"key">>, <<"val">>)),
+  _ = sumo:persist(elements, sr_elements:new(1, <<"val">>)),
 
   ct:comment("Empty or broken parameters are reported"),
   #{status_code := 400} =
@@ -223,17 +224,17 @@ invalid_parameters(_Config) ->
   #{status_code := 400} =
     sr_test_utils:api_call(put, "/elements/nobody", Headers, <<>>),
   #{status_code := 400} =
-    sr_test_utils:api_call(put, "/elements/key", Headers, <<>>),
+    sr_test_utils:api_call(put, "/elements/1", Headers, <<>>),
   #{status_code := 400} =
-    sr_test_utils:api_call(patch, "/elements/key", Headers, <<>>),
+    sr_test_utils:api_call(patch, "/elements/1", Headers, <<>>),
   #{status_code := 400} =
     sr_test_utils:api_call(post, "/elements", Headers, <<"{">>),
   #{status_code := 400} =
     sr_test_utils:api_call(put, "/elements/broken", Headers, <<"{">>),
   #{status_code := 400} =
-    sr_test_utils:api_call(put, "/elements/key", Headers, <<"{">>),
+    sr_test_utils:api_call(put, "/elements/1", Headers, <<"{">>),
   #{status_code := 400} =
-    sr_test_utils:api_call(patch, "/elements/key", Headers, <<"{">>),
+    sr_test_utils:api_call(patch, "/elements/1", Headers, <<"{">>),
 
   ct:comment("Missing parameters are reported"),
   None = #{},
@@ -242,9 +243,9 @@ invalid_parameters(_Config) ->
   #{status_code := 400} =
     sr_test_utils:api_call(put, "/elements/none", Headers, None),
   #{status_code := 400} =
-    sr_test_utils:api_call(put, "/elements/key", Headers, None),
+    sr_test_utils:api_call(put, "/elements/1", Headers, None),
   #{status_code := 400} =
-    sr_test_utils:api_call(patch, "/elements/key", Headers, None),
+    sr_test_utils:api_call(patch, "/elements/1", Headers, None),
 
   NoVal = #{key => <<"noval">>},
   #{status_code := 400} =
@@ -252,9 +253,9 @@ invalid_parameters(_Config) ->
   #{status_code := 400} =
     sr_test_utils:api_call(put, "/elements/noval", Headers, NoVal),
   #{status_code := 400} =
-    sr_test_utils:api_call(put, "/elements/key", Headers, NoVal),
+    sr_test_utils:api_call(put, "/elements/1", Headers, NoVal),
   #{status_code := 400} =
-    sr_test_utils:api_call(patch, "/elements/key", Headers, NoVal),
+    sr_test_utils:api_call(patch, "/elements/1", Headers, NoVal),
 
   {comment, ""}.
 
@@ -264,6 +265,17 @@ not_found(_Config) ->
   #{status_code := 404} = sr_test_utils:api_call(get, "/elements/notfound"),
   #{status_code := 404} = sr_test_utils:api_call(patch, "/elements/notfound"),
   #{status_code := 404} = sr_test_utils:api_call(delete, "/elements/notfound"),
+  {comment, ""}.
+
+-spec binary_id_conversion(sr_test_utils:config()) -> {comment, string()}.
+binary_id_conversion(_Config) ->
+  ct:comment("Different types of ids"),
+  1 = sr_single_entity_handler:id_from_binding_internal(<<"1">>, integer),
+  -1 = sr_single_entity_handler:id_from_binding_internal(<<"one">>, integer),
+  <<"binary">> =
+    sr_single_entity_handler:id_from_binding_internal(<<"binary">>, binary),
+  "string" =
+    sr_single_entity_handler:id_from_binding_internal(<<"string">>, string),
   {comment, ""}.
 
 -spec location(sr_test_utils:config()) -> {comment, string()}.

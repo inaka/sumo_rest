@@ -168,7 +168,7 @@ The next step is to define our models (i.e. the entities our system will manage)
 #### Elements
 [Elements](test/sr_test/sr_elements.erl) are simple key/value pairs.
 ```erlang
--type key() :: binary().
+-type key() :: integer().
 -type value() :: binary() | iodata().
 
 -opaque element() ::
@@ -252,6 +252,17 @@ To let **Sumo Rest** avoid duplicate keys (and return `409 Conflict` in that cas
 ```erlang
 -spec duplication_conditions(element()) -> sumo_rest_doc:duplication_conditions().
 duplication_conditions(Element) -> [{key, '==', key(Element)}].
+```
+
+If your model has an `id` type different than integer, string or binary you have to implement `id_from_binding/1`. That function is needed in order to convert the `id` from `binary()` to your type. There is an example at `sr_elements` module for our test coverage. It only converts to `integer()` but that is the general idea behind that function.
+```erlang
+-spec id_from_binding(binary()) -> key().
+id_from_binding(BinaryId) ->
+  try binary_to_integer(BinaryId) of
+    Id -> Id
+  catch
+    error:badarg -> -1
+  end.
 ```
 
 The rest of the functions in the module are just helpers, particularly useful for our tests.

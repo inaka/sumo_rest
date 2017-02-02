@@ -54,7 +54,7 @@
 -spec sumo_schema() -> sumo:schema().
 sumo_schema() ->
   sumo:new_schema(sessions,
-    [ sumo:new_field(id,          binary,   [id, not_null])
+    [ sumo:new_field(id,          string,   [id, not_null])
     , sumo:new_field(token,       binary,   [not_null])
     , sumo:new_field(agent,       binary,   [])
     , sumo:new_field(user,        binary,   [not_null])

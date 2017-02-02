@@ -17,6 +17,7 @@
         , handle_put/2
         , handle_patch/2
         , delete_resource/2
+        , id_from_binding_internal/2 % exported only for test coverage
         ]).
 
 -type options() :: #{ path => string()
@@ -45,7 +46,8 @@ rest_init(Req, Opts) ->
   #{model := Model} = Opts,
   Module = sumo_config:get_prop_value(Model, module),
   {Id, Req2} = cowboy_req:binding(id, Req1),
-  {ok, Req2, #{opts => Opts, id => Id, module => Module}}.
+  ActualId = id_from_binding(Id, Model, Module),
+  {ok, Req2, #{opts => Opts, id => ActualId, module => Module}}.
 
 %% @doc Verifies if there is an entity with the given <code>id</code>.
 %%      The provided id must be the value for the id field in
@@ -152,3 +154,22 @@ persist({ok, Entity}, Req1, State) ->
   ResBody = sr_json:encode(Module:to_json(PersistedEntity)),
   Req2 = cowboy_req:set_resp_body(ResBody, Req1),
   {true, Req2, State}.
+
+-spec id_from_binding(binary(), atom(), atom()) -> term().
+id_from_binding(Id, Model, Module) ->
+  case erlang:function_exported(Module, id_from_binding, 1) of
+    false -> id_from_binding_internal(Id, sumo_internal:id_field_type(Model));
+    true -> Module:id_from_binding(Id)
+  end.
+
+-spec id_from_binding_internal(binary(), binary | string | integer) -> term().
+id_from_binding_internal(Id, binary) ->
+  Id;
+id_from_binding_internal(Id, string) ->
+  binary_to_list(Id);
+id_from_binding_internal(BinaryId, integer) ->
+  try binary_to_integer(BinaryId) of
+    Id -> Id
+  catch
+    error:badarg -> -1
+  end.
