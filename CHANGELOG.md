@@ -1,15 +1,28 @@
 # Change Log
 
+## [0.3.1](https://github.com/inaka/sumo_rest/tree/0.3.1) (2017-02-02)
+[Full Changelog](https://github.com/inaka/sumo_rest/compare/0.3.0...0.3.1)
+
+**Closed issues:**
+
+- DELETE fails if the entity id type is integer [\#58](https://github.com/inaka/sumo_rest/issues/58)
+
+**Merged pull requests:**
+
+- \[\#58\] addressing the issue with non binary ids [\#59](https://github.com/inaka/sumo_rest/pull/59) ([ferigis](https://github.com/ferigis))
+
 ## [0.3.0](https://github.com/inaka/sumo_rest/tree/0.3.0) (2017-01-30)
 [Full Changelog](https://github.com/inaka/sumo_rest/compare/0.2.1...0.3.0)
 
 **Closed issues:**
 
+- Version Bump to 0.3.0 [\#55](https://github.com/inaka/sumo_rest/issues/55)
 - Change id/1 by  duplication\_conditions/1 to sumo\_rest\_doc [\#53](https://github.com/inaka/sumo_rest/issues/53)
 - Error with rebar3 compile if sumo\_rest is fetched from hex.pm [\#49](https://github.com/inaka/sumo_rest/issues/49)
 
 **Merged pull requests:**
 
+- \[\#55\] Version Bump to 0.3.0 [\#57](https://github.com/inaka/sumo_rest/pull/57) ([ferigis](https://github.com/ferigis))
 - \[\#53\] update the README.md accordingly [\#56](https://github.com/inaka/sumo_rest/pull/56) ([ferigis](https://github.com/ferigis))
 - \[\#53\] replacing id/1 callback by duplication\_conditions/1 [\#54](https://github.com/inaka/sumo_rest/pull/54) ([ferigis](https://github.com/ferigis))
 
