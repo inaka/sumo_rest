@@ -63,7 +63,7 @@ success_scenario(Config) ->
   ct:comment("The session agent can be changed"),
   #{status_code := 200, body := Body2} =
     sr_test_utils:api_call(
-      put, "/sessions/" ++ binary_to_list(Session1Id), Headers,
+      put, "/sessions/" ++ Session1Id, Headers,
       #{agent => <<"a2">>}),
   #{ <<"id">>           := Session1Id
    , <<"agent">>        := <<"a2">>
@@ -101,14 +101,16 @@ success_scenario(Config) ->
   [Session3] = sumo:find_all(sessions) -- [Session2],
 
   ct:comment("Session2 is deleted"),
-  Uri4 = binary_to_list(<<"/sessions/", Session1Id/binary>>),
+  SessionId1Bin = list_to_binary(Session1Id),
+  Uri4 = binary_to_list(<<"/sessions/", SessionId1Bin/binary>>),
   #{status_code := 204} = sr_test_utils:api_call(delete, Uri4, Headers),
 
   ct:comment("One session again"),
   [Session3] = sumo:find_all(sessions),
 
   ct:comment("DELETE is not idempotent"),
-  Uri5 = binary_to_list(<<"/sessions/", Session3Id/binary>>),
+  SessionId3Bin = list_to_binary(Session3Id),
+  Uri5 = binary_to_list(<<"/sessions/", SessionId3Bin/binary>>),
   #{status_code := 204} = sr_test_utils:api_call(delete, Uri5, Headers),
   #{status_code := 404} = sr_test_utils:api_call(delete, Uri5, Headers),
 
@@ -163,7 +165,8 @@ invalid_auth(Config) ->
   [_, {User2Name, _} | _] = application:get_env(sr_test, users, []),
   SessionId =
     sr_sessions:unique_id(sumo:persist(sessions, sr_sessions:new(User2Name))),
-  ForbiddenUri = binary_to_list(<<"/sessions/", SessionId/binary>>),
+  SessionIdBin = list_to_binary(SessionId),
+  ForbiddenUri = binary_to_list(<<"/sessions/", SessionIdBin/binary>>),
   {basic_auth, BasicAuth} = lists:keyfind(basic_auth, 1, Config),
   Headers5 = #{basic_auth => BasicAuth},
   #{status_code := 403} = sr_test_utils:api_call(put, ForbiddenUri, Headers5),
@@ -187,7 +190,8 @@ invalid_headers(Config) ->
   {User, _} = first_user(),
   SessionId =
     sr_sessions:unique_id(sumo:persist(sessions, sr_sessions:new(User))),
-  SessionUri = binary_to_list(<<"/sessions/", SessionId/binary>>),
+  SessionIdBin = list_to_binary(SessionId),
+  SessionUri = binary_to_list(<<"/sessions/", SessionIdBin/binary>>),
 
   ct:comment("content-type must be provided for POST and PUT"),
   #{status_code := 415} =
@@ -219,7 +223,8 @@ invalid_parameters(Config) ->
   {User, _} = first_user(),
   SessionId =
     sr_sessions:unique_id(sumo:persist(sessions, sr_sessions:new(User))),
-  SessionUri = binary_to_list(<<"/sessions/", SessionId/binary>>),
+  SessionIdBin = list_to_binary(SessionId),
+  SessionUri = binary_to_list(<<"/sessions/", SessionIdBin/binary>>),
 
   ct:comment("Empty or broken parameters are reported"),
   #{status_code := 400} =
@@ -263,7 +268,8 @@ location(Config) ->
    } = sr_json:decode(Body1),
   ct:comment("and its location header is set correctly"),
   Location = proplists:get_value(<<"location">>, ResponseHeaders),
-  Location = <<"/sessions/", Session1Id/binary>>,
+  SessionId2Bin = list_to_binary(Session1Id),
+  Location = <<"/sessions/", SessionId2Bin/binary>>,
 
   {comment, ""}.
 

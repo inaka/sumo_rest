@@ -24,5 +24,7 @@
 -callback duplication_conditions(entity()) -> duplication_conditions().
 %% it's only needed if ids are not coming in PUT jsons
 -callback from_json(binary(), json()) -> {ok, entity()} | {error, reason()}.
+%% it's only needed if ids are different from binary, integer or string
+-callback id_from_binding(binary()) -> term().
 
--optional_callbacks([duplication_conditions/1, from_json/2]).
+-optional_callbacks([duplication_conditions/1, from_json/2, id_from_binding/1]).
