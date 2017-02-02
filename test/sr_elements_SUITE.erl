@@ -267,16 +267,15 @@ not_found(_Config) ->
   #{status_code := 404} = sr_test_utils:api_call(delete, "/elements/notfound"),
   {comment, ""}.
 
+-spec binary_id_conversion(sr_test_utils:config()) -> {comment, string()}.
 binary_id_conversion(_Config) ->
-  ct:comment("The id is custom"),
-  1 = sr_single_entity_handler:id_from_binding(custom, <<"1">>, sr_elements),
-  -1 = sr_single_entity_handler:id_from_binding(custom, <<"one">>, sr_elements),
-  ct:comment("The module doesn't have id_from_binding implemented"),
-  <<"1">> =
-    sr_single_entity_handler:id_from_binding(custom, <<"1">>, sr_module),
-  ct:comment("The id is binary"),
+  ct:comment("Different types of ids"),
+  1 = sr_single_entity_handler:id_from_binding_internal(<<"1">>, integer),
+  -1 = sr_single_entity_handler:id_from_binding_internal(<<"one">>, integer),
   <<"binary">> =
-    sr_single_entity_handler:id_from_binding(binary, <<"binary">>, sr_elements),
+    sr_single_entity_handler:id_from_binding_internal(<<"binary">>, binary),
+  "string" =
+    sr_single_entity_handler:id_from_binding_internal(<<"string">>, string),
   {comment, ""}.
 
 -spec location(sr_test_utils:config()) -> {comment, string()}.
