@@ -161,7 +161,7 @@ handle_post(Req, State) ->
   catch
     _:conflict ->
       {ok, Req3} =
-        cowboy_req:reply(409, [], sr_json:error(<<"Duplicated entity">>), Req),
+        cowboy_req:reply(422, [], sr_json:error(<<"Duplicated entity">>), Req),
       {halt, Req3, State};
     _:badjson ->
       Req3 =
