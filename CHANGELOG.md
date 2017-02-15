@@ -1,5 +1,17 @@
 # Change Log
 
+## [0.3.2](https://github.com/inaka/sumo_rest/tree/0.3.2) (2017-02-15)
+[Full Changelog](https://github.com/inaka/sumo_rest/compare/0.3.1...0.3.2)
+
+**Closed issues:**
+
+- POST requests should return 422 instead of 409 when duplication\_conditions fail [\#62](https://github.com/inaka/sumo_rest/issues/62)
+- Version Bump to 0.3.1 [\#60](https://github.com/inaka/sumo_rest/issues/60)
+
+**Merged pull requests:**
+
+- \[\#62\] replacing 409 by 422 [\#63](https://github.com/inaka/sumo_rest/pull/63) ([ferigis](https://github.com/ferigis))
+
 ## [0.3.1](https://github.com/inaka/sumo_rest/tree/0.3.1) (2017-02-02)
 [Full Changelog](https://github.com/inaka/sumo_rest/compare/0.3.0...0.3.1)
 
@@ -9,6 +21,7 @@
 
 **Merged pull requests:**
 
+- \[\#60\] Bump Version to 0.3.1 [\#61](https://github.com/inaka/sumo_rest/pull/61) ([ferigis](https://github.com/ferigis))
 - \[\#58\] addressing the issue with non binary ids [\#59](https://github.com/inaka/sumo_rest/pull/59) ([ferigis](https://github.com/ferigis))
 
 ## [0.3.0](https://github.com/inaka/sumo_rest/tree/0.3.0) (2017-01-30)
