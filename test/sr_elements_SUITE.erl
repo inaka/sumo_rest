@@ -71,7 +71,7 @@ success_scenario(_Config) ->
   [Element1] = sr_json:decode(BodyB),
 
   ct:comment("Element 1 is modified"),
-  #{status_code := 409, body := Body01} =
+  #{status_code := 422, body := Body01} =
     sr_test_utils:api_call(
       put, "/elements", #{<<"content-type">> => <<"application/json">>},
       #{ key   => 1
@@ -176,7 +176,7 @@ duplicated_key(_Config) ->
     sr_test_utils:api_call(post, "/elements", Headers, Body),
 
   ct:comment("Element 1 can't be created again"),
-  #{status_code := 409} =
+  #{status_code := 422} =
     sr_test_utils:api_call(post, "/elements", Headers, Body),
 
   {comment, ""}.

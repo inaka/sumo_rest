@@ -20,7 +20,7 @@
 -callback from_json(json()) -> {ok, entity()} | {error, reason()}.
 -callback update(entity(), json()) -> {ok, entity()} | {error, reason()}.
 -callback location(entity(), path()) -> iodata().
-%% it's only needed if dups should raise 409 conflict
+%% it's only needed if dups should raise 422 conflict
 -callback duplication_conditions(entity()) -> duplication_conditions().
 %% it's only needed if ids are not coming in PUT jsons
 -callback from_json(binary(), json()) -> {ok, entity()} | {error, reason()}.

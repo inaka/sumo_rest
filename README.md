@@ -248,7 +248,7 @@ For **Sumo Rest** to provide urls to the callers, we need to specify the locatio
 location(Element, Path) -> iolist_to_binary([Path, "/", key(Element)]).
 ```
 
-To let **Sumo Rest** avoid duplicate keys (and return `409 Conflict` in that case), we provide the optional callback `duplication_conditions/1`:
+To let **Sumo Rest** avoid duplicate keys (and return `422 Conflict` in that case), we provide the optional callback `duplication_conditions/1`:
 ```erlang
 -spec duplication_conditions(element()) -> sumo_rest_doc:duplication_conditions().
 duplication_conditions(Element) -> [{key, '==', key(Element)}].
@@ -370,7 +370,7 @@ handle_post(Req, State) ->
   catch
     _:conflict ->
       {ok, Req3} =
-        cowboy_req:reply(409, [], sr_json:error(<<"Duplicated entity">>), Req),
+        cowboy_req:reply(422, [], sr_json:error(<<"Duplicated entity">>), Req),
       {halt, Req3, State};
     _:badjson ->
       Req3 =
