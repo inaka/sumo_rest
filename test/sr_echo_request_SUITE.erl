@@ -30,10 +30,10 @@ end_per_testcase(_, Config) ->
   Config.
 
 -spec success_scenario(sr_test_utils:config()) -> {comment, string()}.
-success_scenario(Config) ->
+success_scenario(_Config) ->
   ct:comment("Request an Echo Request"),
   Headers = #{<<"content-type">> => <<"application/json">>},
-  #{status_code := 201, body := _Body} =
-    sr_test_utils:api_call(post, "/echo", Headers, #{<<"hi">> => <<"there">>}),
+  #{status_code := 201} =
+    sr_test_utils:api_call(put, "/echo/1", Headers, #{<<"hi">> => <<"there">>}),
 
   {comment, ""}.

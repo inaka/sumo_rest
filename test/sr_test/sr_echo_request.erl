@@ -5,7 +5,7 @@
 -behaviour(sumo_rest_doc).
 
 -opaque echo_request() ::
-  #{ key      => binary()
+  #{ id       := undefined | binary()
    , headers  := any()
    , path     := any()
    , bindings := any()
@@ -32,10 +32,10 @@
 -spec sumo_schema() -> sumo:schema().
 sumo_schema() ->
   sumo:new_schema(echo_request,
-    [ sumo:new_field(key,      string, [id, not_null])
-    , sumo:new_field(headers,  string, [not_null])
-    , sumo:new_field(path,     string, [not_null])
-    , sumo:new_field(bindings, string, [not_null])
+    [ sumo:new_field(id,       string, [id, not_null])
+    , sumo:new_field(headers,  custom, [not_null])
+    , sumo:new_field(path,     binary, [not_null])
+    , sumo:new_field(bindings, custom, [not_null])
     ]).
 
 -spec sumo_sleep(echo_request()) -> sumo:model().
@@ -46,7 +46,8 @@ sumo_wakeup(EchoRequest) -> EchoRequest.
 
 -spec to_json(echo_request()) -> sr_json:json().
 to_json(EchoRequest) ->
-  #{ headers  => maps:from_list(maps:get(headers, EchoRequest))
+  #{ id       => maps:get(id, EchoRequest)
+   , headers  => maps:from_list(maps:get(headers, EchoRequest))
    , path     => maps:get(path, EchoRequest)
    , bindings => maps:get(bindings, EchoRequest)
    }.
@@ -57,12 +58,13 @@ update(EchoRequest, _Json) ->
   EchoRequest.
 
 -spec location(echo_request(), sumo_rest_doc:path()) -> binary().
-location(#{key := Key}, Path) ->
-  iolist_to_binary([Path, "/", Key]).
+location(#{id := Id}, Path) ->
+  iolist_to_binary([Path, "/", Id]).
 
 -spec from_ctx(sumo_rest_doc:context()) -> {ok, echo_request()}.
 from_ctx(#{req := Req, state := State}) ->
-  {ok, #{ headers => sr_request:headers(Req)
-        , path => sr_request:path(Req)
+  {ok, #{ id       => sr_state:id(State)
+        , headers  => sr_request:headers(Req)
+        , path     => sr_request:path(Req)
         , bindings => sr_request:bindings(Req)
         }}.
