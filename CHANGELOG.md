@@ -1,5 +1,17 @@
 # Change Log
 
+## [0.3.3](https://github.com/inaka/sumo_rest/tree/0.3.3) (2017-02-24)
+[Full Changelog](https://github.com/inaka/sumo_rest/compare/0.3.2...0.3.3)
+
+**Closed issues:**
+
+- Add sumo\_rest\_doc:from\_ctx/1 callback [\#66](https://github.com/inaka/sumo_rest/issues/66)
+- Version Bump to 0.3.2 [\#64](https://github.com/inaka/sumo_rest/issues/64)
+
+**Merged pull requests:**
+
+- Ferigis.66.add from ctx [\#67](https://github.com/inaka/sumo_rest/pull/67) ([ferigis](https://github.com/ferigis))
+
 ## [0.3.2](https://github.com/inaka/sumo_rest/tree/0.3.2) (2017-02-15)
 [Full Changelog](https://github.com/inaka/sumo_rest/compare/0.3.1...0.3.2)
 
@@ -10,6 +22,7 @@
 
 **Merged pull requests:**
 
+- \[\#64\] Version Bump to 0.3.2 [\#65](https://github.com/inaka/sumo_rest/pull/65) ([ferigis](https://github.com/ferigis))
 - \[\#62\] replacing 409 by 422 [\#63](https://github.com/inaka/sumo_rest/pull/63) ([ferigis](https://github.com/ferigis))
 
 ## [0.3.1](https://github.com/inaka/sumo_rest/tree/0.3.1) (2017-02-02)
