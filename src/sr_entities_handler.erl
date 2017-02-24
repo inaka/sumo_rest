@@ -73,20 +73,19 @@ resource_exists(Req, State) ->
 -spec content_types_accepted(cowboy_req:req(), state()) ->
   {[{{binary(), binary(), '*'}, atom()}], cowboy_req:req(), state()}.
 content_types_accepted(Req, State) ->
-    #{path := Path} = sr_state:opts(State),
-    {Method, Req2} = cowboy_req:method(Req),
-    try
-        Trail = trails:retrieve(Path),
-        Metadata = trails:metadata(Trail),
-        AtomMethod = method_to_atom(Method),
-        #{AtomMethod := #{consumes := Consumes}} = Metadata,
-        Handler = compose_handler_name(AtomMethod),
-        RetList = [{iolist_to_binary(X), Handler} || X <- Consumes],
-        {RetList, Req2, State}
-    catch
-        _:_ ->
-            {[{{<<"application">>, <<"json">>, '*'}, handle_post}], Req, State}
-    end.
+  #{path := Path} = sr_state:opts(State),
+  {Method, Req2} = cowboy_req:method(Req),
+  try
+    Trail = trails:retrieve(Path),
+    Metadata = trails:metadata(Trail),
+    AtomMethod = method_to_atom(Method),
+    #{AtomMethod := #{consumes := Consumes}} = Metadata,
+    Handler = compose_handler_name(AtomMethod),
+    RetList = [{iolist_to_binary(X), Handler} || X <- Consumes],
+    {RetList, Req2, State}
+  catch
+    _:_ -> {[{{<<"application">>, <<"json">>, '*'}, handle_post}], Req, State}
+  end.
 
 %% @doc Always returns "application/json" with <code>handle_get</code>.
 %% @see cowboy_rest:content_types_provided/2
@@ -95,20 +94,19 @@ content_types_accepted(Req, State) ->
 -spec content_types_provided(cowboy_req:req(), state()) ->
   {[{binary(), atom()}], cowboy_req:req(), state()}.
 content_types_provided(Req, State) ->
-    #{path := Path} = sr_state:opts(State),
-    {Method, Req2} = cowboy_req:method(Req),
-    try
-        Trail = trails:retrieve(Path),
-        Metadata = trails:metadata(Trail),
-        AtomMethod = method_to_atom(Method),
-        #{AtomMethod := #{produces := Produces}} = Metadata,
-        Handler = compose_handler_name(AtomMethod),
-        RetList = [{iolist_to_binary(X), Handler} || X <- Produces],
-        {RetList, Req2, State}
-    catch
-        _:_ ->
-            {[{<<"application/json">>, handle_get}], Req, State}
-    end.
+  #{path := Path} = sr_state:opts(State),
+  {Method, Req2} = cowboy_req:method(Req),
+  try
+    Trail = trails:retrieve(Path),
+    Metadata = trails:metadata(Trail),
+    AtomMethod = method_to_atom(Method),
+    #{AtomMethod := #{produces := Produces}} = Metadata,
+    Handler = compose_handler_name(AtomMethod),
+    RetList = [{iolist_to_binary(X), Handler} || X <- Produces],
+    {RetList, Req2, State}
+  catch
+    _:_ -> {[{<<"application/json">>, handle_get}], Req, State}
+  end.
 
 %% @doc Returns the list of all entities.
 %%      Fetches the entities from <strong>SumoDB</strong> using the

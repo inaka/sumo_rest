@@ -292,49 +292,17 @@ test_coverage(Config) ->
                           , #{agent => <<"a1">>}),
   [_] = meck:unload(),
 
-  ct:comment("Functions coverage"),
+  ct:comment("Testing sr_state Functions"),
   SrState = sr_state:new([], fake_module_name),
   undefined = sr_state:id(SrState),
   SrState2 = sr_state:set(key, value, SrState),
   value = sr_state:retrieve(key, SrState2, not_found),
   SrState3 = sr_state:remove(key, SrState2),
   not_found = sr_state:retrieve(key, SrState3, not_found),
-  CowboyReq = fake_cowboy_req(),
-  ok = meck:expect(cowboy_req, body, fun(Req) ->
-    {ok, <<"{}">>, Req}
-  end),
-  ok = meck:expect(cowboy_req, bindings, fun(Req) ->
-    {[], Req}
-  end),
-  {SrRequest, _} = sr_request:from_cowboy(CowboyReq),
-  [] = sr_request:headers(SrRequest),
-  <<"/">> = sr_request:path(SrRequest),
-  #{} = sr_request:bindings(SrRequest),
-
-  [_] = meck:unload(),
 
   {comment, ""}.
-
 
 %% @private
 first_user() ->
   [{U, P}|_] = application:get_env(sr_test, users, []),
   {U, P}.
-
-%% @private
-fake_cowboy_req() ->
-  cowboy_req:new( socket
-                , tcp
-                , undefined
-                , <<"GET">>
-                , <<"/">>
-                , <<"">>
-                , 'HTTP/1.1'
-                , []
-                , <<"localhost">>
-                , 8090
-                , <<"">>
-                , false
-                , false
-                , undefined
-                ).
