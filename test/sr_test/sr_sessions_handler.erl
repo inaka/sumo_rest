@@ -55,7 +55,7 @@ is_authorized(Req, State) ->
       Users = application:get_env(sr_test, users, []),
       case lists:member(User, Users) of
         true ->
-        {true, Req1, sr_state:set(user, User, State)};
+          {true, Req1, sr_state:set(user, User, State)};
         false ->
           ct:log("Invalid user ~p not in ~p", [User, Users]),
           {{false, auth_header()}, Req1, State}
