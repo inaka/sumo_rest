@@ -31,6 +31,7 @@ start_phase(start_cowboy_listeners, _StartType, []) ->
     , sr_single_element_handler
     , sr_sessions_handler
     , sr_single_session_handler
+    , sr_echo_request_handler % only for testing
     , cowboy_swagger_handler
     ],
   Routes = trails:trails(Handlers),

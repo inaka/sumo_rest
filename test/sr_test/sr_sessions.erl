@@ -41,7 +41,7 @@
   ]).
 -export(
   [ to_json/1
-  , from_json/1
+  , from_ctx/1
   , from_json/2
   , location/2
   , update/2
@@ -79,10 +79,11 @@ to_json(Session) ->
 
 -spec from_json(id(), sumo_rest_doc:json()) ->
   {ok, session()} | {error, iodata()}.
-from_json(Id, Json) -> from_json(Json#{<<"id">> => Id}).
+from_json(Id, Json) -> from_json_internal(Json#{<<"id">> => Id}).
 
--spec from_json(sumo_rest_doc:json()) -> {ok, session()} | {error, iodata()}.
-from_json(Json) ->
+-spec from_json_internal(sumo_rest_doc:json()) ->
+  {ok, session()} | {error, iodata()}.
+from_json_internal(Json) ->
   Now = sr_json:encode_date(calendar:universal_time()),
   ExpiresAt = sr_json:encode_date(expires_at()),
   try
@@ -100,6 +101,15 @@ from_json(Json) ->
     _:{badkey, Key} ->
       {error, <<"missing field: ", Key/binary>>}
   end.
+
+-spec from_ctx(sumo_rest_doc:context()) -> {ok, session()} | {error, iodata()}.
+from_ctx(#{req := SrRequest, state := State}) ->
+  Json = sr_request:body(SrRequest),
+  {User, _} = sr_state:retrieve(user, State, undefined),
+   case from_json_internal(Json) of
+     {ok, Session} -> {ok, user(Session, User)};
+     MissingField  -> MissingField
+   end.
 
 -spec update(session(), sumo_rest_doc:json()) ->
   {ok, session()} | {error, iodata()}.

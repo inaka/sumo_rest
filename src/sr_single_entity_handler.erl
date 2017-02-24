@@ -24,12 +24,7 @@
                     , model => atom()
                     , verbose => boolean()
                     }.
--type state() :: #{ opts => options()
-                  , id => binary()
-                  , entity => sumo:user_doc()
-                  , module => module()
-                  , _ => _
-                  }.
+-type state() :: sr_state:state().
 -export_type([state/0, options/0]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -47,7 +42,9 @@ rest_init(Req, Opts) ->
   Module = sumo_config:get_prop_value(Model, module),
   {Id, Req2} = cowboy_req:binding(id, Req1),
   ActualId = id_from_binding(Id, Model, Module),
-  {ok, Req2, #{opts => Opts, id => ActualId, module => Module}}.
+  State = sr_state:new(Opts, Module),
+  State1 = sr_state:id(State, ActualId),
+  {ok, Req2, State1}.
 
 %% @doc Verifies if there is an entity with the given <code>id</code>.
 %%      The provided id must be the value for the id field in
@@ -58,10 +55,11 @@ rest_init(Req, Opts) ->
 -spec resource_exists(cowboy_req:req(), state()) ->
   {boolean(), cowboy_req:req(), state()}.
 resource_exists(Req, State) ->
-  #{opts := #{model := Model}, id := Id} = State,
+  Id = sr_state:id(State),
+  #{model := Model} = sr_state:opts(State),
   case sumo:find(Model, Id) of
     notfound -> {false, Req, State};
-    Entity -> {true, Req, State#{entity => Entity}}
+    Entity -> {true, Req, sr_state:entity(State, Entity)}
   end.
 
 %% @doc Renders the found entity.
@@ -69,7 +67,8 @@ resource_exists(Req, State) ->
 -spec handle_get(cowboy_req:req(), state()) ->
   {iodata(), cowboy_req:req(), state()}.
 handle_get(Req, State) ->
-  #{entity := Entity, module := Module} = State,
+  Entity = sr_state:entity(State),
+  Module = sr_state:module(State),
   ResBody = sr_json:encode(Module:to_json(Entity)),
   {ResBody, Req, State}.
 
@@ -79,8 +78,9 @@ handle_get(Req, State) ->
 %% @see resource_exists/2
 -spec handle_patch(cowboy_req:req(), state()) ->
   {{true, binary()} | false | halt, cowboy_req:req(), state()}.
-handle_patch(Req, #{entity := Entity} = State) ->
-  #{module := Module} = State,
+handle_patch(Req, State) ->
+  Entity = sr_state:entity(State),
+  Module = sr_state:module(State),
   try
     {ok, Body, Req1} = cowboy_req:body(Req),
     Json             = sr_json:decode(Body),
@@ -100,31 +100,25 @@ handle_patch(Req, #{entity := Entity} = State) ->
 %% @see resource_exists/2
 -spec handle_put(cowboy_req:req(), state()) ->
   {{true, binary()} | false | halt, cowboy_req:req(), state()}.
-handle_put(Req, #{entity := Entity} = State) ->
-  #{module := Module} = State,
+handle_put(Req, State) ->
   try
-    {ok, Body, Req1} = cowboy_req:body(Req),
-    Json             = sr_json:decode(Body),
-    persist(Module:update(Entity, Json), Req1, State)
+    Module = sr_state:module(State),
+    {SrRequest, Req1} = sr_request:from_cowboy(Req),
+    Entity = case sr_state:entity(State) of
+      undefined ->
+        Context = #{req => SrRequest, state => State},
+        build_entity(Context);
+      OldEntity ->
+        Json = sr_request:body(SrRequest),
+        Module:update(OldEntity, Json)
+    end,
+    persist(Entity, Req1, State)
   catch
     _:badjson ->
-      Req3 =
+      Req2 =
         cowboy_req:set_resp_body(
           sr_json:error(<<"Malformed JSON request">>), Req),
-      {false, Req3, State}
-  end;
-handle_put(Req, #{id := Id} = State) ->
-  #{module := Module} = State,
-  try
-    {ok, Body, Req1} = cowboy_req:body(Req),
-    Json             = sr_json:decode(Body),
-    persist(from_json(Module, Id, Json), Req1, State)
-  catch
-    _:badjson ->
-      Req3 =
-        cowboy_req:set_resp_body(
-          sr_json:error(<<"Malformed JSON request">>), Req),
-      {false, Req3, State}
+      {false, Req2, State}
   end.
 
 %% @doc Deletes the found entity.
@@ -132,13 +126,26 @@ handle_put(Req, #{id := Id} = State) ->
 -spec delete_resource(cowboy_req:req(), state()) ->
   {boolean() | halt, cowboy_req:req(), state()}.
 delete_resource(Req, State) ->
-  #{opts := #{model := Model}, id := Id} = State,
+  Id = sr_state:id(State),
+  #{model := Model} = sr_state:opts(State),
   Result = sumo:delete(Model, Id),
   {Result, Req, State}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Auxiliary Functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+build_entity(#{req := SrRequest, state := State} = Context) ->
+  Module = sr_state:module(State),
+  case erlang:function_exported(Module, from_ctx, 1) of
+    false ->
+      Id = sr_state:id(State),
+      Json = sr_request:body(SrRequest),
+      from_json(Module, Id, Json);
+    true  ->
+      Module:from_ctx(Context)
+  end.
+
 from_json(Module, Id, Json) ->
   try Module:from_json(Id, Json)
   catch
@@ -149,7 +156,8 @@ persist({error, Reason}, Req, State) ->
   Req1 = cowboy_req:set_resp_body(sr_json:error(Reason), Req),
   {false, Req1, State};
 persist({ok, Entity}, Req1, State) ->
-  #{opts := #{model := Model}, module := Module} = State,
+  Module = sr_state:module(State),
+  #{model := Model} = sr_state:opts(State),
   PersistedEntity = sumo:persist(Model, Entity),
   ResBody = sr_json:encode(Module:to_json(PersistedEntity)),
   Req2 = cowboy_req:set_resp_body(ResBody, Req1),
