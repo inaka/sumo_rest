@@ -11,12 +11,12 @@
           , resource_exists/2
           , content_types_accepted/2
           , content_types_provided/2
+          , handle_post/2
           ]
         }]).
 
 -export([ trails/0
         , is_authorized/2
-        , handle_post/2
         ]).
 
 -type state() :: sr_entities_handler:state().
@@ -54,7 +54,8 @@ is_authorized(Req, State) ->
     {User, Req1} ->
       Users = application:get_env(sr_test, users, []),
       case lists:member(User, Users) of
-        true -> {true, Req1, State#{user => User}};
+        true ->
+        {true, Req1, sr_state:set(user, User, State)};
         false ->
           ct:log("Invalid user ~p not in ~p", [User, Users]),
           {{false, auth_header()}, Req1, State}
@@ -86,31 +87,3 @@ get_authorization(Req) ->
 
 -spec auth_header() -> binary().
 auth_header() -> <<"Basic Realm=\"Sumo Rest Test\"">>.
-
--spec handle_post(cowboy_req:req(), map()) ->
-  {{true, binary()} | false | halt, cowboy_req:req(), state()}.
-handle_post(Req, #{opts := Opts} = State) ->
-  #{user := {User, _}, module := Module} = State,
-  try
-    {ok, Body, Req1} = cowboy_req:body(Req),
-    Json             = sr_json:decode(Body),
-    case sr_sessions:from_json(Json) of
-      {error, Reason} ->
-        Req2 = cowboy_req:set_resp_body(sr_json:error(Reason), Req1),
-        {false, Req2, State};
-      {ok, Session} ->
-        FullSession = sr_sessions:user(Session, User),
-        State2 = #{opts => Opts, module => Module},
-        sr_entities_handler:handle_post(FullSession, Req1, State2)
-    end
-  catch
-    _:conflict ->
-      {ok, Req3} =
-        cowboy_req:reply(422, [], sr_json:error(<<"Duplicated entity">>), Req),
-      {halt, Req3, State};
-    _:badjson ->
-      Req3 =
-        cowboy_req:set_resp_body(
-          sr_json:error(<<"Malformed JSON request">>), Req),
-      {false, Req3, State}
-  end.

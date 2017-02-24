@@ -18,10 +18,7 @@
                     , model => atom()
                     , verbose => boolean()
                     }.
--type state() :: #{ opts => options()
-                  , module => module()
-                  , _ => _
-                  }.
+-type state() :: sr_state:state().
 -export_type([state/0, options/0]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -45,7 +42,8 @@ rest_init(Req, Opts) ->
   Req1 = announce_req(Req, Opts),
   #{model := Model} = Opts,
   Module = sumo_config:get_prop_value(Model, module),
-  {ok, Req1, #{opts => Opts, module => Module}}.
+  State = sr_state:new(Opts, Module),
+  {ok, Req1, State}.
 
 %% @doc Retrieves the list of allowed methods from Trails metadata.
 %%      Parses the metadata associated with this path and returns the
@@ -54,7 +52,7 @@ rest_init(Req, Opts) ->
 -spec allowed_methods(cowboy_req:req(), state()) ->
   {[binary()], cowboy_req:req(), state()}.
 allowed_methods(Req, State) ->
-  #{opts := #{path := Path}} = State,
+  #{path := Path} = sr_state:opts(State),
   Trail = trails:retrieve(Path),
   Metadata = trails:metadata(Trail),
   Methods = [atom_to_method(Method) || Method <- maps:keys(Metadata)],
@@ -75,7 +73,7 @@ resource_exists(Req, State) ->
 -spec content_types_accepted(cowboy_req:req(), state()) ->
   {[{{binary(), binary(), '*'}, atom()}], cowboy_req:req(), state()}.
 content_types_accepted(Req, State) ->
-    #{opts := #{path := Path}} = State,
+    #{path := Path} = sr_state:opts(State),
     {Method, Req2} = cowboy_req:method(Req),
     try
         Trail = trails:retrieve(Path),
@@ -97,7 +95,7 @@ content_types_accepted(Req, State) ->
 -spec content_types_provided(cowboy_req:req(), state()) ->
   {[{binary(), atom()}], cowboy_req:req(), state()}.
 content_types_provided(Req, State) ->
-    #{opts := #{path := Path}} = State,
+    #{path := Path} = sr_state:opts(State),
     {Method, Req2} = cowboy_req:method(Req),
     try
         Trail = trails:retrieve(Path),
@@ -120,9 +118,8 @@ content_types_provided(Req, State) ->
 -spec handle_get(cowboy_req:req(), state()) ->
   {iodata(), cowboy_req:req(), state()}.
 handle_get(Req, State) ->
-  #{ opts := #{model := Model}
-   , module := Module
-   } = State,
+  #{model := Model} = sr_state:opts(State),
+  Module = sr_state:module(State),
   {Qs, Req1} = cowboy_req:qs_vals(Req),
   Conditions = [ {binary_to_atom(Name, unicode),
     Value} || {Name, Value} <- Qs ],
@@ -142,16 +139,24 @@ handle_get(Req, State) ->
   {JSON, Req1, State}.
 
 %% @doc Creates a new entity.
-%%      To parse the body, it uses <code>from_json/2</code> from the
+%%      To parse the body, it uses <code>from_ctx</code> or
+%%      <code>from_json/2</code> from the
 %%      <code>model</code> provided in the options.
 -spec handle_post(cowboy_req:req(), state()) ->
   {{true, binary()} | false | halt, cowboy_req:req(), state()}.
 handle_post(Req, State) ->
-  #{module := Module} = State,
+  Module = sr_state:module(State),
   try
-    {ok, Body, Req1} = cowboy_req:body(Req),
-    Json             = sr_json:decode(Body),
-    case Module:from_json(Json) of
+    {SrRequest, Req1} = sr_request:from_cowboy(Req),
+    Result = case erlang:function_exported(Module, from_ctx, 1) of
+      false ->
+        Json = sr_request:body(SrRequest),
+        Module:from_json(Json);
+      true  ->
+        Context = #{req => SrRequest, state => State},
+        Module:from_ctx(Context)
+    end,
+    case Result of
       {error, Reason} ->
         Req2 = cowboy_req:set_resp_body(sr_json:error(Reason), Req1),
         {false, Req2, State};
@@ -175,7 +180,8 @@ handle_post(Req, State) ->
 -spec handle_post(sumo:user_doc(), cowboy_req:req(), state()) ->
   {{true, binary()}, cowboy_req:req(), state()}.
 handle_post(Entity, Req1, State) ->
-  #{opts := #{model := Model, path := Path}, module := Module} = State,
+  #{model := Model, path := Path} = sr_state:opts(State),
+  Module = sr_state:module(State),
   case erlang:function_exported(Module, duplication_conditions, 1) of
     false -> proceed;
     true ->

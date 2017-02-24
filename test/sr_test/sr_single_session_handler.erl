@@ -64,10 +64,11 @@ trails() ->
           },
   [trails:trail(Path, ?MODULE, Opts, Metadata)].
 
--spec forbidden(cowboy_req:req(), map()) ->
-  {boolean(), cowboy_req:req(), map()}.
+-spec forbidden(cowboy_req:req(), state()) ->
+  {boolean(), cowboy_req:req(), state()}.
 forbidden(Req, State) ->
-  #{user := {User, _}, id := Id} = State,
+  {User, _} = sr_state:retrieve(user, State, undefined),
+  Id = sr_state:id(State),
   case sumo:find(sessions, Id) of
     notfound -> {false, Req, State};
     Session -> {User =/= sr_sessions:user(Session), Req, State}
@@ -76,4 +77,5 @@ forbidden(Req, State) ->
 -spec is_conflict(cowboy_req:req(), state()) ->
   {boolean(), cowboy_req:req(), state()}.
 is_conflict(Req, State) ->
-  {not maps:is_key(entity, State), Req, State}.
+  Entity = sr_state:entity(State),
+  {Entity =:= undefined, Req, State}.
