@@ -10,6 +10,7 @@
     , cowboy_swagger
     , jiffy
     , sumo_db
+    , mnesia
     ]},
   {modules, []},
   {mod, {sr_test, []}},
