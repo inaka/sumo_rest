@@ -69,7 +69,7 @@ trails() ->
 forbidden(Req, State) ->
   {User, _} = sr_state:retrieve(user, State, undefined),
   Id = sr_state:id(State),
-  case sumo:find(sessions, Id) of
+  case sumo:fetch(sessions, Id) of
     notfound -> {false, Req, State};
     Session -> {User =/= sr_sessions:user(Session), Req, State}
   end.
