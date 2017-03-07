@@ -11,4 +11,6 @@
 
 -export([init_per_suite/1]).
 
-init_per_suite(Config) -> [{application, sumo_rest} | Config].
+init_per_suite(Config) ->
+    DWs = [error_handling, race_conditions, unmatched_returns, unknown],
+    [ {application, sumo_rest}, {dialyzer_warnings, DWs} | Config].
