@@ -1,5 +1,7 @@
 # Sumo Rest
 
+[![Build Status](https://travis-ci.org/inaka/sumo_rest.svg?branch=master)](https://travis-ci.org/inaka/sumo_rest)
+
 <img src="http://www.technovelgy.com/graphics/content/sumo_robot.jpg" align="right" style="float:right" height="400" />
 
 Generic **Cowboy** handlers to work with **Sumo DB**
