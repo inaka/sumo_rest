@@ -408,7 +408,7 @@ But we needed to prevent users from accessing other user's sessions, so we imple
   {boolean(), cowboy_req:req(), state()}.
 forbidden(Req, State) ->
   #{user := {User, _}, id := Id} = State,
-  case sumo:find(sessions, Id) of
+  case sumo:fetch(sessions, Id) of
     notfound -> {false, Req, State};
     Session -> {User =/= sr_sessions:user(Session), Req, State}
   end.
