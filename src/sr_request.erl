@@ -11,11 +11,13 @@
 %%% Types
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+-type binding_name() :: id | atom().
+
 -opaque req() ::
   #{ body     := sr_json:json()
    , headers  := [{binary(), iodata()}]
    , path     := binary()
-   , bindings := #{atom() => any()}
+   , bindings := #{binding_name() => any()}
    }.
 
 -export_type [req/0].
