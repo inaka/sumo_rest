@@ -39,7 +39,8 @@ start_phase(start_cowboy_listeners, _StartType, []) ->
   Dispatch = trails:single_host_compile(Routes),
 
   TransOpts = [{port, 4891}],
-  ProtoOpts = [{env, [{dispatch, Dispatch}, {compress, true}]}],
+  ProtoOpts = %% cowboy_protocol:opts()
+    [{compress, true}, {env, [{dispatch, Dispatch}]}],
   case cowboy:start_http(sr_test_server, 1, TransOpts, ProtoOpts) of
     {ok, _} -> ok;
     {error, {already_started, _}} -> ok

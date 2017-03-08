@@ -157,7 +157,8 @@ It's crucial that we _store_ the trails. Otherwise, **Sumo Rest** will not be ab
 Then, we start our **Cowboy** server:
 ```erlang
   TransOpts = [{port, 4891}],
-  ProtoOpts = [{env, [{dispatch, Dispatch}, {compress, true}]}],
+  ProtoOpts = %% cowboy_protocol:opts()
+    [{compress, true}, {env, [{dispatch, Dispatch}]}],
   case cowboy:start_http(sr_test_server, 1, TransOpts, ProtoOpts) of
     {ok, _} -> ok;
     {error, {already_started, _}} -> ok
