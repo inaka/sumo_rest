@@ -363,6 +363,7 @@ trails() ->
   Path = "/elements",
   Opts = #{ path => Path
           , model => elements
+          , verbose => true
           },
   [trails:trail(Path, ?MODULE, Opts, Metadata)].
 ```
