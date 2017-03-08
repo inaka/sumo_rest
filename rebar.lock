@@ -9,7 +9,7 @@
  {<<"mixer">>,{pkg,<<"inaka_mixer">>,<<"0.1.5">>},0},
  {<<"quickrand">>,{pkg,<<"quickrand">>,<<"1.5.4">>},2},
  {<<"ranch">>,{pkg,<<"ranch">>,<<"1.3.2">>},1},
- {<<"sumo_db">>,{pkg,<<"sumo_db">>,<<"0.6.1">>},0},
+ {<<"sumo_db">>,{pkg,<<"sumo_db">>,<<"0.6.4">>},0},
  {<<"trails">>,{pkg,<<"trails">>,<<"0.2.0">>},0},
  {<<"uuid">>,{pkg,<<"uuid_erl">>,<<"1.5.2-rc1">>},1},
  {<<"worker_pool">>,{pkg,<<"worker_pool">>,<<"2.0.1">>},1}]}.
@@ -25,7 +25,7 @@
  {<<"mixer">>, <<"754630C0E60221B23E4D83ADF6E789A8B283855E23F9391EEC40980E6E800486">>},
  {<<"quickrand">>, <<"47ADD4755CC5F209CBEFFD6F47C84061196CD7FAD99FD8FD12418EB0D06B939D">>},
  {<<"ranch">>, <<"E4965A144DC9FBE70E5C077C65E73C57165416A901BD02EA899CFD95AA890986">>},
- {<<"sumo_db">>, <<"6D7BF7FEA90D8E41DEA894379A4E945622B8BFDDBB3EEF31D79B3D0CA3084056">>},
+ {<<"sumo_db">>, <<"BA655B9E83FDB6C46766EEBF0F01277ED1FA0CC642A6049862097ADD8AFE0080">>},
  {<<"trails">>, <<"8A26C8F32B2A4D317830FAF55F034CC532D849547686806B83063AA1F65213D2">>},
  {<<"uuid">>, <<"D4022AB3F4F1A28E86EA15D4075CB0C57EC908D8AF1CA2E8AF28AA815EF93C3A">>},
  {<<"worker_pool">>, <<"B90273074898FA89434317991E00884DBBAFFAB5BFD964A7586317CD16FB18D4">>}]}

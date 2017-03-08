@@ -57,7 +57,7 @@ rest_init(Req, Opts) ->
 resource_exists(Req, State) ->
   Id = sr_state:id(State),
   #{model := Model} = sr_state:opts(State),
-  case sumo:find(Model, Id) of
+  case sumo:fetch(Model, Id) of
     notfound -> {false, Req, State};
     Entity -> {true, Req, sr_state:entity(State, Entity)}
   end.
