@@ -25,7 +25,7 @@ jsons(_Config) ->
     , <<"0.3">>
     , <<"\"a string\"">>
     , <<"[true,true,false]">>
-    , <<"{\"c\":[1,2,3],\"a\":\"b\"}">>
+    , <<"{\"a\":\"b\",\"c\":[1,2,3]}">>
     ],
   lists:foreach(WorksWith, Jsons),
 

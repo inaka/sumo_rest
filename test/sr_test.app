@@ -8,7 +8,7 @@
     , sasl
     , cowboy
     , cowboy_swagger
-    , jiffy
+    , jsx
     , sumo_db
     , mnesia
     ]},

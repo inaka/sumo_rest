@@ -26,12 +26,12 @@
 
 %% @doc Internal representation to string
 -spec encode(json()) -> iodata().
-encode(Json) -> jiffy:encode(Json, [uescape]).
+encode(Json) -> jsx:encode(Json, [uescape]).
 
 %% @doc String to internal representation
 -spec decode(iodata()) -> json().
 decode(Data) ->
-  try jiffy:decode(Data, [return_maps])
+  try jsx:decode(Data, [return_maps])
   catch
     _:_Error ->
       throw(badjson)
