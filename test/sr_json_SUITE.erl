@@ -65,10 +65,12 @@ nulls(_Config) ->
 
 -spec types(sr_test_utils:config()) -> {comment, string()}.
 types(_Config) ->
+  Nested = #{a => #{b => [1, #{c => [true, 1.2, <<"binary">>]}]}},
   JsonTypes = [ [<<"binary">>, <<"binary">>, <<"binary">>]
               , [1, 2, 3, 4, 5]
-              , [#{a => 1}, #{b => 2}]
-              , [<<"mixed">>, <<"list">>, 3, #{a => []}, a, true, 3.2]
+              , [#{a => 1}, #{b => 2}, #{c => Nested}]
+              , Nested
+              , [<<"mixed">>, <<"list">>, Nested, 3, #{a => []}, a, true, 3.2]
               ],
   _ = [sr_json:encode(Json) || Json <- JsonTypes],
 
