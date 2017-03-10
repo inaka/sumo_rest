@@ -9,7 +9,7 @@
 -type key() :: binary() | atom().
 -type object() :: #{key() => json()}.
 -type json() :: object()
-              | [object()]
+              | [json()]
               | binary()
               | number()
               | boolean()
