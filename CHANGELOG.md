@@ -1,15 +1,36 @@
 # Change Log
 
+## [0.3.4](https://github.com/inaka/sumo_rest/tree/0.3.4) (2017-03-10)
+[Full Changelog](https://github.com/inaka/sumo_rest/compare/0.3.3...0.3.4)
+
+**Closed issues:**
+
+- Wrong specs in sr\_single\_entity\_handler \(handle\_put and handle\_patch\) [\#80](https://github.com/inaka/sumo_rest/issues/80)
+- Missing option in type spec `sr\_json: json\(\)` [\#79](https://github.com/inaka/sumo_rest/issues/79)
+
+**Merged pull requests:**
+
+- \[\#80\] wrong return value on specs [\#82](https://github.com/inaka/sumo_rest/pull/82) ([ferigis](https://github.com/ferigis))
+- \[\#79\] missing spec added [\#81](https://github.com/inaka/sumo_rest/pull/81) ([ferigis](https://github.com/ferigis))
+- Review all handlers in sample application to be verbose [\#77](https://github.com/inaka/sumo_rest/pull/77) ([lucafavatella](https://github.com/lucafavatella))
+- Correct usage of cowboy `compress` option, and clarify type by comment [\#76](https://github.com/inaka/sumo_rest/pull/76) ([lucafavatella](https://github.com/lucafavatella))
+- Highlight the role of the `:id` binding in cowboy route [\#75](https://github.com/inaka/sumo_rest/pull/75) ([lucafavatella](https://github.com/lucafavatella))
+- Bump sumo\_db to the latest point release of sumo\_db 0.6.x [\#74](https://github.com/inaka/sumo_rest/pull/74) ([lucafavatella](https://github.com/lucafavatella))
+- List mnesia as dependency of test application [\#72](https://github.com/inaka/sumo_rest/pull/72) ([lucafavatella](https://github.com/lucafavatella))
+- Plant CI [\#71](https://github.com/inaka/sumo_rest/pull/71) ([lucafavatella](https://github.com/lucafavatella))
+
 ## [0.3.3](https://github.com/inaka/sumo_rest/tree/0.3.3) (2017-02-24)
 [Full Changelog](https://github.com/inaka/sumo_rest/compare/0.3.2...0.3.3)
 
 **Closed issues:**
 
+- Version Bump to 0.3.3 [\#68](https://github.com/inaka/sumo_rest/issues/68)
 - Add sumo\_rest\_doc:from\_ctx/1 callback [\#66](https://github.com/inaka/sumo_rest/issues/66)
 - Version Bump to 0.3.2 [\#64](https://github.com/inaka/sumo_rest/issues/64)
 
 **Merged pull requests:**
 
+- \[\#68\] Version Bump to 0.3.3 [\#69](https://github.com/inaka/sumo_rest/pull/69) ([ferigis](https://github.com/ferigis))
 - Ferigis.66.add from ctx [\#67](https://github.com/inaka/sumo_rest/pull/67) ([ferigis](https://github.com/ferigis))
 
 ## [0.3.2](https://github.com/inaka/sumo_rest/tree/0.3.2) (2017-02-15)
