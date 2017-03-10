@@ -68,7 +68,7 @@ types(_Config) ->
   JsonTypes = [ [<<"binary">>, <<"binary">>, <<"binary">>]
               , [1, 2, 3, 4, 5]
               , [#{a => 1}, #{b => 2}]
-              , [<<"mixed">>, <<"list">>, 3, #{a => []}]
+              , [<<"mixed">>, <<"list">>, 3, #{a => []}, a, true, 3.2]
               ],
   _ = [sr_json:encode(Json) || Json <- JsonTypes],
 
