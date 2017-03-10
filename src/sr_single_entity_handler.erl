@@ -77,7 +77,7 @@ handle_get(Req, State) ->
 %%      <code>model</code> provided in the options.
 %% @see resource_exists/2
 -spec handle_patch(cowboy_req:req(), state()) ->
-  {{true, binary()} | false | halt, cowboy_req:req(), state()}.
+  {boolean() | halt, cowboy_req:req(), state()}.
 handle_patch(Req, State) ->
   Entity = sr_state:entity(State),
   Module = sr_state:module(State),
@@ -99,7 +99,7 @@ handle_patch(Req, State) ->
 %%      from the <code>model</code> provided in the options.
 %% @see resource_exists/2
 -spec handle_put(cowboy_req:req(), state()) ->
-  {{true, binary()} | false | halt, cowboy_req:req(), state()}.
+  {boolean() | halt, cowboy_req:req(), state()}.
 handle_put(Req, State) ->
   try
     Module = sr_state:module(State),
