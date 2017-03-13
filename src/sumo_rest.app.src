@@ -12,7 +12,7 @@
     , cowboy
     , trails
     , cowboy_swagger
-    , jiffy
+    , jsx
     , sumo_db
     , iso8601
     ]},
