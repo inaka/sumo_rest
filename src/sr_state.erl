@@ -20,8 +20,14 @@
 %%% Types
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+-type options() ::
+  #{ path := string()
+   , model := atom()
+   , verbose => boolean()
+   }.
+
 -opaque state() ::
-  #{ opts      := sumo_rest:options()
+  #{ opts      := options()
    , id        => binary()
    , entity    => sumo:user_doc()
    , module    := module()
@@ -34,7 +40,7 @@
 %%% Constructor, Getters/Setters
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
--spec new(sumo_rest:options(), module()) -> state().
+-spec new(options(), module()) -> state().
 new(Opts, Module) ->
   #{opts => Opts, module => Module, user_opts => #{}}.
 
@@ -62,7 +68,7 @@ entity(State, Entity) ->
 module(#{module := Module}) ->
   Module.
 
--spec opts(state()) -> sumo_rest:options().
+-spec opts(state()) -> options().
 opts(#{opts := Opts}) ->
   Opts.
 

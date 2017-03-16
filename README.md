@@ -294,7 +294,7 @@ This is how the `context`'s spec looks like. It is composed by a `sr_request:req
 ... In sr_state.erl ...
 
 -opaque state() ::
-  #{ opts      := sumo_rest:options()
+  #{ opts      := sr_state:options()
    , id        => binary()
    , entity    => sumo:user_doc()
    , module    := module()
