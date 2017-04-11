@@ -1,10 +1,10 @@
 %%% @doc Json abstraction library
 -module(sr_json).
 
--export([encode/1, decode/1]).
--export([encode_date/1, decode_date/1]).
--export([encode_null/1, decode_null/1]).
--export([error/1]).
+-export( [encode/1, decode/1]).
+-export( [encode_date/1, decode_date/1]).
+-export( [encode_null/1, decode_null/1]).
+-export( [error/1]).
 
 -type key() :: binary() | atom().
 -type object() :: #{key() => json()}.
