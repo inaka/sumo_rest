@@ -11,4 +11,17 @@
 
 -export([init_per_suite/1]).
 
-init_per_suite(Config) -> [{application, sumo_rest} | Config].
+init_per_suite(Config) ->
+  DWs = [error_handling, race_conditions, unmatched_returns, unknown],
+  [ {application, sumo_rest}
+  , {dialyzer_warnings, DWs}
+  , {dirs, [ "ebin"
+           %% , "test"
+           %%
+           %% Do not include `"test"` in order to avoid spurious
+           %% warnings with `unknown` e.g. [`Unknown function
+           %% ct:comment/1`](https://github.com/inaka/katana-test/issues/38).
+           , "test/sr_test"
+           ]}
+  | Config
+  ].
