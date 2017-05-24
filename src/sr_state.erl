@@ -8,6 +8,7 @@
         , entity/2
         , module/1
         , opts/1
+        , path/1
         ]).
 
 %% functions to work with user opts
@@ -71,6 +72,10 @@ module(#{module := Module}) ->
 -spec opts(state()) -> options().
 opts(#{opts := Opts}) ->
   Opts.
+
+-spec path(state()) -> string().
+path(#{opts := #{path := Path}}) ->
+  Path.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% User opts Functions
