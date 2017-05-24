@@ -11,9 +11,11 @@ all() -> sr_test_utils:all(?MODULE).
 state(_Config) ->
   ct:comment("Testing sr_state functions"),
   Module = fake_module_name,
-  Opts = #{model => value1, path => "/path"},
+  Path = "/path",
+  Opts = #{model => value1, path => Path},
   SrState = sr_state:new(Opts, Module),
   Module = sr_state:module(SrState),
+  Path = sr_state:path(SrState),
   Opts = sr_state:opts(SrState),
   undefined = sr_state:id(SrState),
   Id = <<"myId">>,
