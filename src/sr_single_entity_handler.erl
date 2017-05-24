@@ -20,10 +20,7 @@
         , id_from_binding_internal/2 % exported only for test coverage
         ]).
 
--type options() :: #{ path => string()
-                    , model => atom()
-                    , verbose => boolean()
-                    }.
+-type options() :: sr_state:options().
 -type state() :: sr_state:state().
 -export_type([state/0, options/0]).
 

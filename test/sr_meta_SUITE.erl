@@ -9,6 +9,7 @@
          ]
        }]).
 
--export([init_per_suite/1]).
+-export([init_per_suite/1, end_per_suite/1]).
 
 init_per_suite(Config) -> [{application, sumo_rest} | Config].
+end_per_suite(Config) -> Config.
