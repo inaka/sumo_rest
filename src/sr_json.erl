@@ -31,7 +31,7 @@ encode(Json) -> jsx:encode(Json, [uescape]).
 %% @doc String to internal representation
 -spec decode(iodata()) -> json().
 decode(Data) ->
-  try jsx:decode(Data, [return_maps])
+  try jsx:decode(Data, [strict, return_maps])
   catch
     _:_Error ->
       throw(badjson)
