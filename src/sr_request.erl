@@ -13,9 +13,12 @@
 
 -type binding_name() :: id | atom().
 
+-type http_header_name_lowercase() :: binary().
+-type http_header() :: {http_header_name_lowercase(), iodata()}.
+
 -opaque req() ::
   #{ body     := sr_json:json()
-   , headers  := [{binary(), iodata()}]
+   , headers  := [http_header()]
    , path     := binary()
    , bindings := #{binding_name() => any()}
    }.
@@ -44,7 +47,7 @@ from_cowboy(CowboyReq) ->
 body(#{body := Body}) ->
   Body.
 
--spec headers(req()) -> [{binary(), iodata()}].
+-spec headers(req()) -> [http_header()].
 headers(#{headers := Headers}) ->
   Headers.
 
