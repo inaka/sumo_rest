@@ -23,7 +23,7 @@
 -callback from_json(json()) -> {ok, entity()} | {error, reason()}.
 -callback from_ctx(context()) -> {ok, entity()} | {error, reason()}.
 -callback update(entity(), json()) -> {ok, entity()} | {error, reason()}.
--callback location(entity(), path()) -> iodata().
+-callback location(entity(), path()) -> binary().
 %% it's only needed if dups should raise 422 conflict
 -callback duplication_conditions(entity()) -> duplication_conditions().
 %% it's only needed if ids are not coming in PUT jsons
